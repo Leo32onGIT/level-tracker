@@ -73,17 +73,24 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
-    // Filter only the interesting deaths (nemesis bosses, rare bestiary)
+    /***
+		// Filter only the interesting deaths (nemesis bosses, rare bestiary)
     val notableDeaths: List[CharDeath] = charDeaths.toList.filter { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name))
     }
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
+		***/
+		val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
+      val guild = charDeath.char.characters.character.guild.getOrElse(None)
+      val guildText = if (guild.isDefined) s"*${guild.rank}* of the **${guild.name}**.\n" else ""
+			val deathText = s"Killed at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>"
+			val embedText = guildText + deathText
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
-        .setDescription(s"Killed at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>")
+        .setDescription(embedText)
         .setThumbnail(creatureImageUrl(killer))
         .setColor(13773097)
         .build()
