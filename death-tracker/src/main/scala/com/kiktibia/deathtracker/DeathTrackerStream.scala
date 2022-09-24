@@ -84,10 +84,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val guild = charDeath.char.characters.character.guild.getOrElse(None)
+      val guildName = charDeath.char.characters.character.guild.name.getOrElse(None)
       var guildText = ""
-			if (guild != None){
-				guildText = s"*${guild.rank}* of the **${guild.name}**.\n"
+			if (guildName != None){
+				val guildRank = charDeath.char.characters.character.guild.rank.getOrElse(None)
+				guildText = s"*$guildRank* of the **$guildName**.\n"
 			}
 			val deathText = s"Killed at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
 			val embedText = guildText + deathText
