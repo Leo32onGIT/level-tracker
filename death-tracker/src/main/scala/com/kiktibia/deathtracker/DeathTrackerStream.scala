@@ -87,8 +87,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     // WIP
     val guild = charDeath.char.characters.character.guild
-    var guildText = guild.map(Some(_)).getOrElse("")
-    println(guildText)
+    var guildText = guild.flatten.toMap
 
     // check if death was by another player
     val pvp = charDeath.death.killers.last.player
@@ -99,7 +98,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     }
 
     val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-    val embedText = s"$guild $context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
+    val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
     new EmbedBuilder()
       .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       .setDescription(embedText)
