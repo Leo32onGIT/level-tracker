@@ -97,7 +97,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = "**No Guild** :x:"
+      var guildText = "**No Guild** :x:\n"
       if (guildName != "") {
         guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
