@@ -86,7 +86,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     var embedThumbnail = creatureImageUrl(killer)
 
     var guildLine = ""
-    val guild = charDeath.char.characters.character.guild
+    val guild = Guild(charDeath.char.characters.character.guild.name, charDeath.char.characters.character.guild.rank)
     if (!(guild.isEmpty)) {
         guildLine = s"${guild.rank} of the ${guild.name}\n"
     }
