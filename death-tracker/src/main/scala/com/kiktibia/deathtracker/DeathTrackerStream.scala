@@ -87,8 +87,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     // WIP
     var guildText = ""
-    val guild: Map[String, String] = charDeath.char.characters.character.guild.getOrElse("", "")
-    //println(guild.name)
+    val guild = charDeath.char.characters.character.guild.get("name").getOrElse("")
+    aprintln(guild)
 
     // check if death was by another player
     val pvp = charDeath.death.killers.last.player
