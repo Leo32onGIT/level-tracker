@@ -13,9 +13,15 @@ object Config {
   val creatureUrlMappings: Map[String, String] = root.getObject("creature-url-mappings").asScala.map {
     case (k, v) => k -> v.unwrapped().toString
   }.toMap
+
   // nemesis filter
   val notableCreatures: List[String] = root.getStringList("notable-creatures").asScala.toList
-  val nemesisRole: String = root.getString("nemesis-role")
+	val nemesisCreatures: List[String] = root.getStringList("nemesis-creatures").asScala.toList
+	val archfoeCreatures: List[String] = root.getStringList("archfoe-creatures").asScala.toList
+	val baneCreatures: List[String] = root.getStringList("bane-creatures").asScala.toList
+  val notableRole: String = root.getString("notable-role")
   val nemesisEmoji: String = root.getString("nemesis-emoji")
+	val archfoeEmoji: String = root.getString("archfoe-emoji")
+	val baneEmoji: String = root.getString("bane-emoji")
 
 }

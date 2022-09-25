@@ -83,19 +83,36 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
-    var nemesisPoke = ""
+    var notablePoke = ""
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
       var embedThumbnail = creatureImageUrl(killer)
-      var nemesisIcon = ""
+
+      // poke if killer is in notable-creatures config
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        nemesisPoke = Config.nemesisRole // take this from application.conf
-        nemesisIcon = Config.nemesisEmoji // server nemesis emoji
+        notablePoke = Config.notableRole
       }
 
-      // WIP
+      var bossIcon = ""
+      // nemesis icon
+      val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
+      if (nemesis == true){
+        bossIcon = Config.nemesisEmoji ++ " "
+      }
+      // archfoe icon
+      val archfoe = Config.archfoeCreatures.contains(killer.toLowerCase())
+      if (archfoe == true){
+        bossIcon = Config.archfoeEmoji ++ " "
+      }
+      // bane icon
+      val bane = Config.baneCreatures.contains(killer.toLowerCase())
+      if (bane == true){
+        bossIcon = Config.baneEmoji ++ " "
+      }
+
+      // guild rank and name
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
@@ -113,7 +130,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $nemesisIcon**$killer**\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $bossIcon**$killer**\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
@@ -126,7 +143,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       deathsChannel.sendMessageEmbeds(embed).queue()
     }
     if (nemesisPoke != ""){
-      deathsChannel.sendMessage(nemesisPoke).queue();
+      deathsChannel.sendMessage(notablePoke).queue();
     }
     cleanUp()
 
