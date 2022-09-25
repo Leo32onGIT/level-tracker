@@ -90,16 +90,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var pokeMention = ""
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        pokeMention = "<@&867319735572758538>" // role to mention
+        pokeMention = "<@&1023679025333420043>\n" // role to mention
       }
 
       // WIP
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = ""
+      var guildText = ":x: **No Guild**"
       if (guildName != "") {
-        guildText = s"**Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName)\n"
+        guildText = s":white_check_mark: **Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
 
       // check if death was by another player
@@ -111,7 +111,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>.\n$pokeMention"
+      val embedText = s"$pokeMention $guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
