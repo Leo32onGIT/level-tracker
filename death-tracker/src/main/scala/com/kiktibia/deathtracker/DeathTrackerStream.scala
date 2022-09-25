@@ -83,15 +83,23 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
     val charName = charDeath.char.characters.character.name
     val killer = charDeath.death.killers.last.name
-    val pvp = charDeath.death.killers.last.player
     var embedThumbnail = creatureImageUrl(killer)
+
+    var guildLine = ""
+    val guild: Option[Guild] = charDeath.char.characters.character.guild
+    if (!(guild.isEmpty)) {
+        guildLine = s"${guild.rank} of the ${guild.name}\n"
+    }
+    // check if death was by another player
+    val pvp = charDeath.death.killers.last.player
     var context = "Died"
     if (pvp == true) {
        context = "Killed"
        embedThumbnail = creatureImageUrl("White_Skull_(Item)")
     }
+
     val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-    val embedText = s"$context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
+    val embedText = s"$guildLine $context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
     new EmbedBuilder()
       .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       .setDescription(embedText)
