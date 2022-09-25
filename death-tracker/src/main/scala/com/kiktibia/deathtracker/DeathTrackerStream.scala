@@ -87,7 +87,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     // WIP
     val guild = charDeath.char.characters.character.guild
-    val guildName = if(!(guild.isEmpty)) guild.head else ""
+    val guildName = if(!(guild.isEmpty)) guild.head.name else ""
     val guildText = s"$guildName\n"
 
     // check if death was by another player
