@@ -74,23 +74,30 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
     /***
-		// Filter only the interesting deaths (nemesis bosses, rare bestiary)
+    // Filter only the interesting deaths (nemesis bosses, rare bestiary)
     val notableDeaths: List[CharDeath] = charDeaths.toList.filter { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name))
     }
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
-		***/
-		val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
-      val charName = charDeath.char.characters.character.name
-      val killer = charDeath.death.killers.last.name
-      val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-			val embedText = s"Killed at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
-      new EmbedBuilder()
-        .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
-        .setDescription(embedText)
-        .setThumbnail(creatureImageUrl(killer))
-        .setColor(13773097)
-        .build()
+    ***/
+    val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
+    val charName = charDeath.char.characters.character.name
+    val killer = charDeath.death.killers.last.name
+    val pvp = charDeath.death.killers.last.player
+    var embedThumbnail = creatureImageUrl(killer)
+    var context = "Died"
+    if (pvp == true) {
+       context = "Killed"
+       embedThumbnail = creatureImageUrl("White_Skull_(Item)")
+    }
+    val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
+    val embedText = s"$context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
+    new EmbedBuilder()
+      .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
+      .setDescription(embedText)
+      .setThumbnail(creatureImageUrl(killer))
+      .setColor(13773097)
+      .build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
