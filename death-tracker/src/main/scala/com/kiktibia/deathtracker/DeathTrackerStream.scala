@@ -86,8 +86,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     var embedThumbnail = creatureImageUrl(killer)
 
     // WIP
-    val guild = charDeath.char.characters.character.guild
-    var guildText = guild.flatten.toMap
+    val guild = charDeath.char.characters.character.guild.getOrElse(Guild("",""))
+    val guildText = s"Test ${guild.name}\n"
 
     // check if death was by another player
     val pvp = charDeath.death.killers.last.player
