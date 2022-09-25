@@ -91,7 +91,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     guildMap.map { g =>
       val guildName = g.name
       val guildRank = g.rank
-      guild = s"*$guildRank* of **$guildName**"
+      guild = s"*$guildRank* of **$guildName**\n"
     }
 
     // check if death was by another player
