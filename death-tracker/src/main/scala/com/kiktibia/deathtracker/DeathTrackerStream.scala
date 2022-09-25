@@ -88,9 +88,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
       var embedThumbnail = creatureImageUrl(killer)
+      var nemesisIcon = ""
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        nemesisPoke = s"<@&1023679025333420043> <:nemesis:1023686587365728306> **${killer}**" // role to mention
+        nemesisPoke = Config.nemesisRole // take this from application.conf
+        nemesisIcon = Config.nemesisEmoji // server nemesis emoji
       }
 
       // WIP
@@ -111,7 +113,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $nemesisIcon**$killer**\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
