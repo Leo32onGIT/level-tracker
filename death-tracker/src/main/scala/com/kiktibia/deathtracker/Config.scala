@@ -14,6 +14,6 @@ object Config {
     case (k, v) => k -> v.unwrapped().toString
   }.toMap
 	// nemesis filter
-	// val notableCreatures: List[String] = root.getStringList("notable-creatures").asScala.toList
+	val notableCreatures: List[String] = root.getStringList("notable-creatures").asScala.toList
 
 }

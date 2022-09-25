@@ -73,43 +73,51 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
-    /***
+
     // Filter only the interesting deaths (nemesis bosses, rare bestiary)
+    /***
     val notableDeaths: List[CharDeath] = charDeaths.toList.filter { charDeath =>
-      Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name))
+      Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
     }
+
+
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
-    val charName = charDeath.char.characters.character.name
-    val killer = charDeath.death.killers.last.name
-    var embedThumbnail = creatureImageUrl(killer)
+      val charName = charDeath.char.characters.character.name
+      val killer = charDeath.death.killers.last.name
+      var embedThumbnail = creatureImageUrl(killer)
+      var pokeMention = ""
+      val poke = Config.notableCreatures.contains(killer.toLowerCase())
+      if (poke == true) {
+        pokeMention = "<@&867319735572758538>" // role to mention
+      }
 
-    // WIP
-    val guild = charDeath.char.characters.character.guild
-    val guildName = if(!(guild.isEmpty)) guild.head.name else ""
-    val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-    var guildText = ""
-    if (guildName != "") {
-      guildText = s"**Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName)\n"
-    }
+      // WIP
+      val guild = charDeath.char.characters.character.guild
+      val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+      val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
+      var guildText = ""
+      if (guildName != "") {
+        guildText = s"**Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName)\n"
+      }
 
-    // check if death was by another player
-    val pvp = charDeath.death.killers.last.player
-    var context = "Died"
-    if (pvp == true) {
-       context = "Killed"
-       embedThumbnail = creatureImageUrl("White_Skull_(Item)")
-    }
+      // check if death was by another player
+      val pvp = charDeath.death.killers.last.player
+      var context = "Died"
+      if (pvp == true) {
+         context = "Killed"
+         embedThumbnail = creatureImageUrl("White_Skull_(Item)")
+      }
 
-    val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-    val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>."
-    new EmbedBuilder()
-      .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
-      .setDescription(embedText)
-      .setThumbnail(embedThumbnail)
-      .setColor(13773097)
-      .build()
+      val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
+      val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>.\n$pokeMention"
+      new EmbedBuilder()
+        .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
+        .setDescription(embedText)
+        .setThumbnail(embedThumbnail)
+        .setColor(13773097)
+        .build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
