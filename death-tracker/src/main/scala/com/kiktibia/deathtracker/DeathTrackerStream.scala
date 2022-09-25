@@ -91,7 +91,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
     var guildText = ""
     if (guildName != "") {
-      guildText = s"*$guildRank* of the **$guildName**\n"
+      guildText = s"[Guild](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName) | *$guildRank* of the **$guildName**\n"
     }
 
     // check if death was by another player
@@ -103,7 +103,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     }
 
     val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-    val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>."
+    val embedText = s"$guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>."
     new EmbedBuilder()
       .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       .setDescription(embedText)
