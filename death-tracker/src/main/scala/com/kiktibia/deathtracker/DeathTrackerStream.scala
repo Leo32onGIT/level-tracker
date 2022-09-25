@@ -87,7 +87,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     // WIP
     var guild = ""
-    val guildMap: Option[Guild] = charDeath.char.characters.character.guild
+    val guildMap: Option[List] = charDeath.char.characters.character.guild
     guildMap.map { g =>
       val guildName = g.name
       val guildRank = g.rank
