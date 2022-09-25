@@ -90,7 +90,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var pokeMention = ""
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        pokeMention = "<@&1023679025333420043>\n" // role to mention
+        pokeMention = ":nemesis: <@&1023679025333420043>\n" // role to mention
       }
 
       // WIP
@@ -111,7 +111,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$pokeMention $guildText $context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by **$killer**\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
