@@ -91,7 +91,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
     var guildText = ""
     if (guildName != "") {
-      guildText = s"[Guild](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName) | *$guildRank* of the **$guildName**\n"
+      guildText = s"**Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=$guildName)\n"
     }
 
     // check if death was by another player
