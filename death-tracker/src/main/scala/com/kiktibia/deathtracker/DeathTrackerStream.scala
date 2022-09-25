@@ -103,7 +103,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     new EmbedBuilder()
       .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       .setDescription(embedText)
-      .setThumbnail(creatureImageUrl(killer))
+      .setThumbnail(embedThumbnail)
       .setColor(13773097)
       .build()
     }
