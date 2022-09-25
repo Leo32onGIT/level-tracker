@@ -90,7 +90,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var embedThumbnail = creatureImageUrl(killer)
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        nemesisPoke = s"<@&1023679025333420043> :nemesis: ${killer}" // role to mention
+        nemesisPoke = s"<@&1023679025333420043> <:nemesis:1023686587365728306> **${killer}**" // role to mention
       }
 
       // WIP
