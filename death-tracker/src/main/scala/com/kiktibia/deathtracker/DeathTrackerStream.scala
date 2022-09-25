@@ -83,14 +83,14 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
+    var nemesisPoke = ""
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
       var embedThumbnail = creatureImageUrl(killer)
-      var pokeMention = ""
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
-        pokeMention = ":nemesis: <@&1023679025333420043>\n" // role to mention
+        nemesisPoke = s"<@&1023679025333420043> :nemesis: ${killer}" // role to mention
       }
 
       // WIP
@@ -122,6 +122,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
       deathsChannel.sendMessageEmbeds(embed).queue()
+    }
+    if (nemesisPoke != ""){
+      deathsChannel.sendMessage(nemesisPoke).queue();
     }
     cleanUp()
 
