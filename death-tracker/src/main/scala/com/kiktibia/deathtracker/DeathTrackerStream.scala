@@ -89,12 +89,6 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val killer = charDeath.death.killers.last.name
       var embedThumbnail = creatureImageUrl(killer)
 
-      // poke if killer is in notable-creatures config
-      val poke = Config.notableCreatures.contains(killer.toLowerCase())
-      if (poke == true) {
-        notablePoke = Config.notableRole
-      }
-
       var bossIcon = ""
       // nemesis icon
       val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
@@ -113,11 +107,15 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       // guild rank and name
+      var embedColor = 7536640 // dark red default
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
       var guildText = "**No Guild** :x:\n"
       if (guildName != "") {
+        if (guildName == "Loyalty"){
+          embedColor = 13773097 // bright red
+        }
         guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
 
@@ -126,7 +124,15 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var context = "Died"
       if (pvp == true) {
          context = "Killed"
+         embedColor = 13773097 // bright red
          embedThumbnail = creatureImageUrl("White_Skull_(Item)")
+      }
+
+      // poke if killer is in notable-creatures config
+      val poke = Config.notableCreatures.contains(killer.toLowerCase())
+      if (poke == true) {
+        notablePoke = Config.notableRole
+        embedColor = 3316516 // bright green
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
@@ -135,7 +141,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
         .setThumbnail(embedThumbnail)
-        .setColor(13773097)
+        .setColor(embedColor)
         .build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
