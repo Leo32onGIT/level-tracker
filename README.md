@@ -1,6 +1,13 @@
 # Death Tracker
 
-Discord bot to track when players are killed by nemesis bosses or rare bestiary
+Discord bot to track when players are killed on Seanera.    
+
+![in a guild](https://i.imgur.com/6KAvSjh.png)   
+![neutral](https://i.imgur.com/FEymk3w.png)
+
+It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/seanera/death-tracker/src/main/resources/application.conf#L5) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/seanera/death-tracker/src/main/resources/application.conf#L19-L87).
+
+![tracked boss](https://i.imgur.com/cXF8r8j.png)
 
 # Deployment steps
 
