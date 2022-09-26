@@ -126,12 +126,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       // does player have guild?
       if (guildName != "") {
         // is player an ally
-        val allyGuilds = Config.huntedList.contains(guildName.toLowerCase())
+        val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 13773097 // bright red
         }
         // is player in hunted guild
-        val huntedGuilds = Config.huntedList.contains(guildName.toLowerCase())
+        val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
         if (huntedGuilds == true){
           embedColor = 36941 // bright green
         }
@@ -140,12 +140,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // player
       // ally player
-      val allyPlayers = Config.huntedList.contains(charName.toLowerCase())
+      val allyPlayers = Config.allyPlayers.contains(charName.toLowerCase())
       if (allyPlayers == true){
         embedColor = 13773097 // bright red
       }
       // hunted player
-      val huntedPlayers = Config.huntedList.contains(charName.toLowerCase())
+      val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
       if (huntedPlayers == true){
         embedColor = 36941 // bright green
       }
