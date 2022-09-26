@@ -107,14 +107,14 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       // guild rank and name
-      var embedColor = 9637647 // dark red default
+      var embedColor = None: Option[Int] // dark red default
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
       var guildText = "**No Guild** :x:\n"
       if (guildName != "") {
         if (guildName == "Loyalty"){
-          embedColor = 13773097 // bright red
+          embedColor = Some(13773097) // bright red
         }
         guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
@@ -124,7 +124,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var context = "Died"
       if (pvp == true) {
          context = "Killed"
-         embedColor = 13773097 // bright red
+         embedColor = Some(13773097) // bright red
          embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
       }
 
@@ -132,7 +132,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
         notablePoke = Config.notableRole
-        embedColor = 3316516 // bright green
+        embedColor = Some(3316516) // bright green
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
