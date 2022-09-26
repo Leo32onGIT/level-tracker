@@ -112,27 +112,49 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
       var guildText = "**No Guild** :x:\n"
-      if (guildName != "") {
-        if (guildName == "Loyalty"){
-          embedColor = 13773097 // bright red
-        }
-        guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
-      }
 
       // check if death was by another player
       val pvp = charDeath.death.killers.last.player
       var context = "Died"
       if (pvp == true) {
          context = "Killed"
-         embedColor = 13773097 // bright red
+         embedColor = 14869218 // bone white
          embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
+      }
+
+      // guild
+      // does player have guild?
+      if (guildName != "") {
+        // is player an ally
+        val allyGuilds = Config.huntedList.contains(guildName.toLowerCase())
+        if (allyGuilds == true){
+          embedColor = 13773097 // bright red
+        }
+        // is player in hunted guild
+        val huntedGuilds = Config.huntedList.contains(guildName.toLowerCase())
+        if (huntedGuilds == true){
+          embedColor = 36941 // bright green
+        }
+        guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+      }
+
+      // player
+      // ally player
+      val allyPlayers = Config.huntedList.contains(charName.toLowerCase())
+      if (allyPlayers == true){
+        embedColor = 13773097 // bright red
+      }
+      // hunted player
+      val huntedPlayers = Config.huntedList.contains(charName.toLowerCase())
+      if (huntedPlayers == true){
+        embedColor = 36941 // bright green
       }
 
       // poke if killer is in notable-creatures config
       val poke = Config.notableCreatures.contains(killer.toLowerCase())
       if (poke == true) {
         notablePoke = Config.notableRole
-        embedColor = 3316516 // bright green
+        embedColor = 4922769 // bright purple
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond

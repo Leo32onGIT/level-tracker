@@ -24,4 +24,10 @@ object Config {
 	val archfoeEmoji: String = root.getString("archfoe-emoji")
 	val baneEmoji: String = root.getString("bane-emoji")
 
+	// hunted
+	val huntedGuilds: List[String] = root.getStringList("hunted-guilds").asScala.toList
+	val allyGuilds: List[String] = root.getStringList("ally-guilds").asScala.toList
+	val huntedPlayers: List[String] = root.getStringList("hunted-players").asScala.toList
+	val allyPlayers: List[String] = root.getStringList("ally-players").asScala.toList
+
 }
