@@ -125,7 +125,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (pvp == true) {
          context = "Killed"
          embedColor = 13773097 // bright red
-         embedThumbnail = creatureImageUrl("White_Skull_(Item)")
+         embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
       }
 
       // poke if killer is in notable-creatures config
