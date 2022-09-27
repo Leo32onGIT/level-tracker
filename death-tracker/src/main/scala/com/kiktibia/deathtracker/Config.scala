@@ -23,11 +23,13 @@ object Config {
   val nemesisEmoji: String = root.getString("nemesis-emoji")
 	val archfoeEmoji: String = root.getString("archfoe-emoji")
 	val baneEmoji: String = root.getString("bane-emoji")
+	val summonEmoji: String = root.getString("summon-emoji")
 
 	// hunted
 	val huntedGuilds: List[String] = root.getStringList("hunted-guilds").asScala.toList
 	val allyGuilds: List[String] = root.getStringList("ally-guilds").asScala.toList
 	val huntedPlayers: List[String] = root.getStringList("hunted-players").asScala.toList
 	val allyPlayers: List[String] = root.getStringList("ally-players").asScala.toList
+	val bossSummons: List[String] = root.getStringList("boss-summons").asScala.toList
 
 }

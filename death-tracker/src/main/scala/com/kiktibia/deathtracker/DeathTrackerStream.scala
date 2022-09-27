@@ -105,6 +105,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (bane == true){
         bossIcon = Config.baneEmoji ++ " "
       }
+      // summon icon
+      val bosssummon = Config.bossSummons.contains(killer.toLowerCase())
+      if (bosssummon == true){
+        bossIcon = Config.summonEmoji ++ " "
+      }
 
       // guild rank and name
       var embedColor = 3553599 // background default
