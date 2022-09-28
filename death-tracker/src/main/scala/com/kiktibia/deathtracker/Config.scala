@@ -31,5 +31,7 @@ object Config {
 	val huntedPlayers: List[String] = root.getStringList("hunted-players").asScala.toList
 	val allyPlayers: List[String] = root.getStringList("ally-players").asScala.toList
 	val bossSummons: List[String] = root.getStringList("boss-summons").asScala.toList
+	val allyGuild: String = root.getString("allyguild-emoji")
+	val otherGuild: String = root.getString("otherguild-emoji")
 
 }

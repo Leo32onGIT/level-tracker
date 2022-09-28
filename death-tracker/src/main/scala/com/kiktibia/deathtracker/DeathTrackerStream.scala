@@ -116,7 +116,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = "**No Guild** :x:\n"
+      var guildText = ":x: **No Guild**\n"
 
       // check if death was by another player
       val pvp = charDeath.death.killers.last.player
@@ -129,18 +129,20 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // guild
       // does player have guild?
+			var guildIcon = Config.otherGuild
       if (guildName != "") {
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 13773097 // bright red
+					guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
         if (huntedGuilds == true){
           embedColor = 36941 // bright green
         }
-        guildText = s"**Guild** :white_check_mark: *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+        guildText = s"$guildIcon **Guild** *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
 
       // player
