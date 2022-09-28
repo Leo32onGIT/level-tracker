@@ -34,4 +34,15 @@ object Config {
 	val allyGuild: String = root.getString("allyguild-emoji")
 	val otherGuild: String = root.getString("otherguild-emoji")
 
+	// quests
+	val mkEmoji: String = root.getString("mk-emoji")
+	val mkBosses: List[String] = root.getStringList("mk-bosses").asScala.toList
+	val cubeEmoji: String = root.getString("cube-emoji")
+	val cubeBosses: List[String] = root.getStringList("cube-bosses").asScala.toList
+	val svarGreenEmoji: String = root.getString("svar-green-emoji")
+	val svarGreenBosses: List[String] = root.getStringList("svar-green-bosses").asScala.toList
+	val svarScrapperEmoji: String = root.getString("svar-scrapper-emoji")
+	val svarScrapperBosses: List[String] = root.getStringList("svar-scrapper-bosses").asScala.toList
+	val svarWarlordEmoji: String = root.getString("svar-warlord-emoji")
+	val svarWarlordBosses: List[String] = root.getStringList("svar-warlord-bosses").asScala.toList
 }

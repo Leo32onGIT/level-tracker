@@ -129,13 +129,13 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // guild
       // does player have guild?
-			var guildIcon = Config.otherGuild
+  var guildIcon = Config.otherGuild
       if (guildName != "") {
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 13773097 // bright red
-					guildIcon = Config.allyGuild
+  guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
@@ -162,6 +162,28 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (poke == true) {
         notablePoke = Config.notableRole
         embedColor = 4922769 // bright purple
+      }
+
+      // quests
+      val cubeQuest = Config.cubeBosses.contains(killer.toLowerCase())
+      if (cubeQuest == true){
+        bossIcon = Config.cubeEmoji ++ " "
+      }
+      val mkQuest = Config.mkBosses.contains(killer.toLowerCase())
+      if (mkQuest == true){
+        bossIcon = Config.mkEmoji ++ " "
+      }
+      val svarGreenQuest = Config.svarGreenBosses.contains(killer.toLowerCase())
+      if (svarGreenQuest == true){
+        bossIcon = Config.svarGreenEmoji ++ " "
+      }
+      val svarScrapperQuest = Config.svarScrapperBosses.contains(killer.toLowerCase())
+      if (svarScrapperQuest == true){
+        bossIcon = Config.svarScrapperEmoji ++ " "
+      }
+      val svarWarlordQuest = Config.svarWarlordBosses.contains(killer.toLowerCase())
+      if (svarWarlordQuest == true){
+        bossIcon = Config.svarWarlordEmoji ++ " "
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
