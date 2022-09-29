@@ -189,6 +189,18 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (zelosMini == true){
         bossIcon = Config.zelosEmoji ++ " "
       }
+      val libFinal = Config.libBosses.contains(killer.toLowerCase())
+      if (libFinal == true){
+        bossIcon = Config.libEmoji ++ " "
+      }
+      val hodFinal = Config.hodBosses.contains(killer.toLowerCase())
+      if (hodFinal == true){
+        bossIcon = Config.hodEmoji ++ " "
+      }
+      val feruFinal = Config.feruBosses.contains(killer.toLowerCase())
+      if (feruFinal == true){
+        bossIcon = Config.feruEmoji ++ " "
+      }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
       val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $bossIcon**$killer**\n$context at <t:$epochSecond>"

@@ -47,4 +47,10 @@ object Config {
 	val svarWarlordBosses: List[String] = root.getStringList("svar-warlord-bosses").asScala.toList
 	val zelosEmoji: String = root.getString("zelos-emoji")
 	val zelosBosses: List[String] = root.getStringList("zelos-bosses").asScala.toList
+	val libEmoji: String = root.getString("library-emoji")
+	val libBosses: List[String] = root.getStringList("library-bosses").asScala.toList
+	val hodEmoji: String = root.getString("hod-emoji")
+	val hodBosses: List[String] = root.getStringList("hod-bosses").asScala.toList
+	val feruEmoji: String = root.getString("feru-emoji")
+	val feruBosses: List[String] = root.getStringList("feru-bosses").asScala.toList
 }
