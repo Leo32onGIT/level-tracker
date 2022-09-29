@@ -79,10 +79,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val notableDeaths: List[CharDeath] = charDeaths.toList.filter { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
     }
-
-
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
+
     var notablePoke = ""
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
@@ -129,13 +128,13 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // guild
       // does player have guild?
-  var guildIcon = Config.otherGuild
+      var guildIcon = Config.otherGuild
       if (guildName != "") {
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 13773097 // bright red
-  guildIcon = Config.allyGuild
+          guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
@@ -200,6 +199,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val feruFinal = Config.feruBosses.contains(killer.toLowerCase())
       if (feruFinal == true){
         bossIcon = Config.feruEmoji ++ " "
+      }
+      val inq = Config.inqBosses.contains(killer.toLowerCase())
+      if (inq == true){
+        bossIcon = Config.inqEmoji ++ " "
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond

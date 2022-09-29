@@ -53,4 +53,6 @@ object Config {
 	val hodBosses: List[String] = root.getStringList("hod-bosses").asScala.toList
 	val feruEmoji: String = root.getString("feru-emoji")
 	val feruBosses: List[String] = root.getStringList("feru-bosses").asScala.toList
+	val inqEmoji: String = root.getString("inq-emoji")
+	val inqBosses: List[String] = root.getStringList("inq-bosses").asScala.toList
 }
