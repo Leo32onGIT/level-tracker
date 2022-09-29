@@ -45,4 +45,6 @@ object Config {
 	val svarScrapperBosses: List[String] = root.getStringList("svar-scrapper-bosses").asScala.toList
 	val svarWarlordEmoji: String = root.getString("svar-warlord-emoji")
 	val svarWarlordBosses: List[String] = root.getStringList("svar-warlord-bosses").asScala.toList
+	val zelosEmoji: String = root.getString("zelos-emoji")
+	val zelosBosses: List[String] = root.getStringList("zelos-bosses").asScala.toList
 }

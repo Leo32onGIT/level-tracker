@@ -185,6 +185,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (svarWarlordQuest == true){
         bossIcon = Config.svarWarlordEmoji ++ " "
       }
+      val zelosMini = Config.zelosBosses.contains(killer.toLowerCase())
+      if (zelosMini == true){
+        bossIcon = Config.zelosEmoji ++ " "
+      }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
       val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $bossIcon**$killer**\n$context at <t:$epochSecond>"
