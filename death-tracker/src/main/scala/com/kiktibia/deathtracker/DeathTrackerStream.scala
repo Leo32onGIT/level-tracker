@@ -89,7 +89,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // WIP
       val killerList = charDeath.death.killers
-			var killerBuffer = mutable.ListBuffer[String]
+			var killerBuffer = ListBuffer[String]()
       if (killerList.nonEmpty) {
 				killerList.foreach { k =>
 					killerBuffer += k.name
