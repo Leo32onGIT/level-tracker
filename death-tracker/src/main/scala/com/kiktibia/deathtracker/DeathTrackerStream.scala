@@ -96,9 +96,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 					killerBuffer += k.name
 				}
 			}
-			val killerText = killerBuffer.view.init
-			  if (killerText.nonEmpty) {
-			    killerText.mkString(", ") + " and " + killerBuffer.last
+			val killerInit = killerBuffer.view.init
+			val killerText =
+			  if (killerInit.nonEmpty) {
+			    killerInit.mkString(", ") + " and " + killerBuffer.last
 			  } else killerBuffer.headOption.getOrElse("")
 
       logger.info(killerText)
