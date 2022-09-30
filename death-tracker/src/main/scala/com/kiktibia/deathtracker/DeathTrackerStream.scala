@@ -89,7 +89,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // WIP
       var killerList = charDeath.death.killers.map(_.name).view.init
-      val KillerText =
+      val killerText =
         if (killerList.nonEmpty) {
           killerList.mkString(", ") + " and " + killerList.last
         } else killerList.headOption.getOrElse("")
