@@ -93,7 +93,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         if (killerList.nonEmpty) {
           killerList.mkString(", ") + " and " + killerList.last
         } else killerList.headOption.getOrElse("")
-      println(killerText)
+      logger.info(killerText)
 
       var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
