@@ -94,7 +94,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
           if (k.player == true) {
-            killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+						val isSummon = k.name.split(" of ")
+						if (isSummon.length > 1){
+							if (isSummon(0).contains("familiar") || isSummon(0).contains("a ")) {
+								killerBuffer += s"**${isSummon(0)} of [${isSummon(1)}](${isSummon(1)})**"
+							} else {
+								killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+							}
+						} else {
+							killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+						}
           } else {
             killerBuffer += k.name
           }
