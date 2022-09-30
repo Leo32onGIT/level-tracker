@@ -96,7 +96,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 					killerBuffer += k.name
 				}
 			}
-      logger.info(killerBuffer.mkString(", "))
+			val killerText = killerBuffer.view.init
+			  if (killerText.nonEmpty) {
+			    killerText.mkString(", ") + " and " + killerBuffer.last
+			  } else killerBuffer.headOption.getOrElse("")
+
+      logger.info(killerText)
 
       var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
