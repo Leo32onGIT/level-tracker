@@ -89,19 +89,25 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val killer = charDeath.death.killers.last.name
 
       // WIP
+      var killerBuffer = ListBuffer[String]()
       val killerList = charDeath.death.killers
-			var killerBuffer = ListBuffer[String]()
       if (killerList.nonEmpty) {
-				killerList.foreach { k =>
-					killerBuffer += k.name
-				}
-			}
-			val killerInit = killerBuffer.view.init
-			val killerText =
-			  if (killerInit.nonEmpty) {
-			    killerInit.mkString(", ") + " and " + killerBuffer.last
-			  } else killerBuffer.headOption.getOrElse("")
+        killerList.foreach { k =>
+          if (k.player == true) {
+            killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+          } else {
+            killerBuffer += k.name
+          }
+        }
+      }
+      // convert to string
+      val killerInit = killerBuffer.view.init
+      val killerText =
+        if (killerInit.nonEmpty) {
+          killerInit.mkString(", ") + " and " + killerBuffer.last
+        } else killerBuffer.headOption.getOrElse("")
 
+      // debug
       logger.info(killerText)
 
       var embedThumbnail = creatureImageUrl(killer)
