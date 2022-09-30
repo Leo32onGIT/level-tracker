@@ -96,13 +96,13 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
           if (k.player == true) {
 						val isSummon = k.name.split(" of ")
 						if (isSummon.length > 1){
-							if (isSummon(0).contains("familiar") || isSummon(0).contains("a ")) {
-								killerBuffer += s"**${isSummon(0)} of [${isSummon(1)}](${isSummon(1)})**"
+							if (isSummon(0).exists(_.isUpper) == false) {
+								killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
 							} else {
-								killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+								killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
 							}
 						} else {
-							killerBuffer += s"[${k.name}](${charUrl(k.name)})"
+							killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
 						}
           } else {
             killerBuffer += k.name
@@ -143,7 +143,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       // guild rank and name
-      var embedColor = 3553599 // background default
+      var embedColor = 3092790 // background default
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
