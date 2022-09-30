@@ -86,8 +86,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
-      var embedThumbnail = creatureImageUrl(killer)
 
+      // WIP
+      var killerList = charDeath.death.killers.map(_.name).view.init
+      val KillerText =
+        if (killerList.nonEmpty) {
+          killerList.mkString(", ") + " and " + killerList.last
+        } else killerList.headOption.getOrElse("")
+      println(killerText)
+
+      var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
       // nemesis icon
       val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
