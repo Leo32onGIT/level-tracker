@@ -93,6 +93,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var bossIcon = ""
       var vowelCheck = "" // this is for adding "an" or "a" in front of creature names
       var killerBuffer = ListBuffer[String]()
+  var exivaBuffer = ListBuffer[String]()
+  var exivaList = ""
       val killerList = charDeath.death.killers // get all killers
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
@@ -105,11 +107,14 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
               if (isSummon.length > 1){
                 if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
                   killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+  exivaBuffer += isSummon(1)
                 } else {
                   killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
+  exivaBuffer += k.name
                 }
               } else {
                 killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
+  exivaBuffer += k.name
               }
             }
           } else {
@@ -173,92 +178,17 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         }
       }
 
+      if (exivaBuffer.nonEmpty) {
+          exivaBuffer.foreach { exiva =>
+          exivaList += s"""\n`exiva "$exiva"`"""
+        }
+      }
       // convert formatted killer list to one string
       val killerInit = killerBuffer.view.init
       val killerText =
         if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
         } else killerBuffer.headOption.getOrElse("")
-
-      // debug
-      //logger.info(killerText)
-
-      // check if death was by another player
-      /***
-      val pvp = charDeath.death.killers.head.player
-      if (pvp == true) {
-       context = "Killed"
-       embedColor = 14869218 // bone white
-       embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
-      }
-      ***/
-
-      // nemesis icon
-      /***
-      val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
-      if (nemesis == true){
-        bossIcon = Config.nemesisEmoji ++ " "
-      }
-      // archfoe icon
-      val archfoe = Config.archfoeCreatures.contains(killer.toLowerCase())
-      if (archfoe == true){
-        bossIcon = Config.archfoeEmoji ++ " "
-      }
-      // bane icon
-      val bane = Config.baneCreatures.contains(killer.toLowerCase())
-      if (bane == true){
-        bossIcon = Config.baneEmoji ++ " "
-      }
-      // summon icon
-      val bosssummon = Config.bossSummons.contains(killer.toLowerCase())
-      if (bosssummon == true){
-        bossIcon = Config.summonEmoji ++ " "
-      }
-      ***/
-
-      /***
-      // quests
-      val cubeQuest = Config.cubeBosses.contains(killer.toLowerCase())
-      if (cubeQuest == true){
-        bossIcon = Config.cubeEmoji ++ " "
-      }
-      val mkQuest = Config.mkBosses.contains(killer.toLowerCase())
-      if (mkQuest == true){
-        bossIcon = Config.mkEmoji ++ " "
-      }
-      val svarGreenQuest = Config.svarGreenBosses.contains(killer.toLowerCase())
-      if (svarGreenQuest == true){
-        bossIcon = Config.svarGreenEmoji ++ " "
-      }
-      val svarScrapperQuest = Config.svarScrapperBosses.contains(killer.toLowerCase())
-      if (svarScrapperQuest == true){
-        bossIcon = Config.svarScrapperEmoji ++ " "
-      }
-      val svarWarlordQuest = Config.svarWarlordBosses.contains(killer.toLowerCase())
-      if (svarWarlordQuest == true){
-        bossIcon = Config.svarWarlordEmoji ++ " "
-      }
-      val zelosMini = Config.zelosBosses.contains(killer.toLowerCase())
-      if (zelosMini == true){
-        bossIcon = Config.zelosEmoji ++ " "
-      }
-      val libFinal = Config.libBosses.contains(killer.toLowerCase())
-      if (libFinal == true){
-        bossIcon = Config.libEmoji ++ " "
-      }
-      val hodFinal = Config.hodBosses.contains(killer.toLowerCase())
-      if (hodFinal == true){
-        bossIcon = Config.hodEmoji ++ " "
-      }
-      val feruFinal = Config.feruBosses.contains(killer.toLowerCase())
-      if (feruFinal == true){
-        bossIcon = Config.feruEmoji ++ " "
-      }
-      val inq = Config.inqBosses.contains(killer.toLowerCase())
-      if (inq == true){
-        bossIcon = Config.inqEmoji ++ " "
-      }
-      ***/
 
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
@@ -281,7 +211,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         if (huntedGuilds == true){
           embedColor = 36941 // bright green
         }
-        guildText = s"$guildIcon **Guild** | *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+        guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
 
       // player
@@ -304,7 +234,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
