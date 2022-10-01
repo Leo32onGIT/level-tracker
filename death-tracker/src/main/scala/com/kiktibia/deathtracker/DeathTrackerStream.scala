@@ -179,11 +179,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       if (exivaBuffer.nonEmpty) {
-        exivaBuffer.zipWithIndex.foreach { case (i,exiva) =>
+        exivaBuffer.zipWithIndex.foreach { case (exiva, i) =>
           if (i == 0){
-            exivaList += s"""<:exiva:1025866744918716416>\t`exiva "$exiva"`\n"""
+            exivaList += s"""\n<:exiva:1025866744918716416>\t`exiva "$exiva"`"""
           } else {
-            exivaList += s"""\t\t`exiva "$exiva"`\n"""
+            exivaList += s"""\n\t\t`exiva "$exiva"`"""
           }
         }
       }
