@@ -101,16 +101,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
-            }
-            val isSummon = k.name.split(" of ") // e.g: fire elemental of Violent Beams
-            if (isSummon.length > 1){
-              if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
-                killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+              val isSummon = k.name.split(" of ") // e.g: fire elemental of Violent Beams
+              if (isSummon.length > 1){
+                if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
+                  killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+                } else {
+                  killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
+                }
               } else {
-                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
+                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
               }
-            } else {
-              killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
             }
           } else {
             // custom emojis for flavour
