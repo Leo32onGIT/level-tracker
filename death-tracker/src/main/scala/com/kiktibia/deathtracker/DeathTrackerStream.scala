@@ -183,7 +183,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
           if (i == 0){
             exivaList += s"""\n<:exiva:1025866744918716416> `exiva "$exiva"`"""
           } else {
-            exivaList += s"""\n\u3000 `exiva "$exiva"`"""
+            exivaList += s"""\n<:indent:1025915320285798451> `exiva "$exiva"`"""
           }
         }
       }
