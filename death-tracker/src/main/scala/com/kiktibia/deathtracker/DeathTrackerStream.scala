@@ -88,6 +88,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
 
+			var embedThumbnail = creatureImageUrl(killer)
+			var bossIcon = ""
       // WIP
       var killerBuffer = ListBuffer[String]()
       val killerList = charDeath.death.killers
@@ -105,10 +107,53 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 							killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
 						}
           } else {
-            killerBuffer += k.name
+						if (Config.nemesisCreatures.contains(k.name)){
+							bossIcon = Config.nemesisEmoji ++ " "
+						}
+						if (Config.archfoeCreatures.contains(k.name)){
+							bossIcon = Config.archfoeEmoji ++ " "
+						}
+						if (Config.baneCreatures.contains(k.name)){
+							bossIcon = Config.baneEmoji ++ " "
+						}
+						if (Config.bossSummons.contains(k.name)){
+							bossIcon = Config.summonEmoji ++ " "
+						}
+						if (Config.cubeBosses.contains(k.name)){
+							bossIcon = Config.cubeEmoji ++ " "
+						}
+						if (Config.mkBosses.contains(k.name)){
+							bossIcon = Config.mkEmoji ++ " "
+						}
+						if (Config.svarGreenBosses.contains(k.name)){
+							bossIcon = Config.svarGreenEmoji ++ " "
+						}
+						if (Config.svarScrapperBosses.contains(k.name)){
+							bossIcon = Config.svarScrapperEmoji ++ " "
+						}
+						if (Config.svarWarlordBosses.contains(k.name)){
+							bossIcon = Config.svarWarlordEmoji ++ " "
+						}
+						if (Config.zelosBosse.contains(k.name)){
+							bossIcon = Config.zelosEmoji ++ " "
+						}
+						if (Config.libBosses.contains(k.name)){
+							bossIcon = Config.libEmoji ++ " "
+						}
+						if (Config.hodBosses.contains(k.name)){
+							bossIcon = Config.hodEmoji ++ " "
+						}
+						if (Config.feruBosses.contains(k.name)){
+							bossIcon = Config.feruEmoji ++ " "
+						}
+						if (Config.inqBosses.contains(k.name)){
+							bossIcon = Config.inqEmoji ++ " "
+						}
+            killerBuffer += s"$bossIcon**${k.name}**"
           }
         }
       }
+
       // convert to string
       val killerInit = killerBuffer.view.init
       val killerText =
@@ -117,11 +162,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         } else killerBuffer.headOption.getOrElse("")
 
       // debug
-      logger.info(killerText)
+      //logger.info(killerText)
 
-      var embedThumbnail = creatureImageUrl(killer)
-      var bossIcon = ""
       // nemesis icon
+			/***
       val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
       if (nemesis == true){
         bossIcon = Config.nemesisEmoji ++ " "
@@ -141,6 +185,51 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (bosssummon == true){
         bossIcon = Config.summonEmoji ++ " "
       }
+			***/
+
+			/***
+			// quests
+      val cubeQuest = Config.cubeBosses.contains(killer.toLowerCase())
+      if (cubeQuest == true){
+        bossIcon = Config.cubeEmoji ++ " "
+      }
+      val mkQuest = Config.mkBosses.contains(killer.toLowerCase())
+      if (mkQuest == true){
+        bossIcon = Config.mkEmoji ++ " "
+      }
+      val svarGreenQuest = Config.svarGreenBosses.contains(killer.toLowerCase())
+      if (svarGreenQuest == true){
+        bossIcon = Config.svarGreenEmoji ++ " "
+      }
+      val svarScrapperQuest = Config.svarScrapperBosses.contains(killer.toLowerCase())
+      if (svarScrapperQuest == true){
+        bossIcon = Config.svarScrapperEmoji ++ " "
+      }
+      val svarWarlordQuest = Config.svarWarlordBosses.contains(killer.toLowerCase())
+      if (svarWarlordQuest == true){
+        bossIcon = Config.svarWarlordEmoji ++ " "
+      }
+      val zelosMini = Config.zelosBosses.contains(killer.toLowerCase())
+      if (zelosMini == true){
+        bossIcon = Config.zelosEmoji ++ " "
+      }
+      val libFinal = Config.libBosses.contains(killer.toLowerCase())
+      if (libFinal == true){
+        bossIcon = Config.libEmoji ++ " "
+      }
+      val hodFinal = Config.hodBosses.contains(killer.toLowerCase())
+      if (hodFinal == true){
+        bossIcon = Config.hodEmoji ++ " "
+      }
+      val feruFinal = Config.feruBosses.contains(killer.toLowerCase())
+      if (feruFinal == true){
+        bossIcon = Config.feruEmoji ++ " "
+      }
+      val inq = Config.inqBosses.contains(killer.toLowerCase())
+      if (inq == true){
+        bossIcon = Config.inqEmoji ++ " "
+      }
+			***/
 
       // guild rank and name
       var embedColor = 3092790 // background default
@@ -150,7 +239,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var guildText = ":x: **No Guild**\n"
 
       // check if death was by another player
-      val pvp = charDeath.death.killers.last.player
+      val pvp = charDeath.death.killers.head.player
       var context = "Died"
       if (pvp == true) {
          context = "Killed"
@@ -195,50 +284,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         embedColor = 4922769 // bright purple
       }
 
-      // quests
-      val cubeQuest = Config.cubeBosses.contains(killer.toLowerCase())
-      if (cubeQuest == true){
-        bossIcon = Config.cubeEmoji ++ " "
-      }
-      val mkQuest = Config.mkBosses.contains(killer.toLowerCase())
-      if (mkQuest == true){
-        bossIcon = Config.mkEmoji ++ " "
-      }
-      val svarGreenQuest = Config.svarGreenBosses.contains(killer.toLowerCase())
-      if (svarGreenQuest == true){
-        bossIcon = Config.svarGreenEmoji ++ " "
-      }
-      val svarScrapperQuest = Config.svarScrapperBosses.contains(killer.toLowerCase())
-      if (svarScrapperQuest == true){
-        bossIcon = Config.svarScrapperEmoji ++ " "
-      }
-      val svarWarlordQuest = Config.svarWarlordBosses.contains(killer.toLowerCase())
-      if (svarWarlordQuest == true){
-        bossIcon = Config.svarWarlordEmoji ++ " "
-      }
-      val zelosMini = Config.zelosBosses.contains(killer.toLowerCase())
-      if (zelosMini == true){
-        bossIcon = Config.zelosEmoji ++ " "
-      }
-      val libFinal = Config.libBosses.contains(killer.toLowerCase())
-      if (libFinal == true){
-        bossIcon = Config.libEmoji ++ " "
-      }
-      val hodFinal = Config.hodBosses.contains(killer.toLowerCase())
-      if (hodFinal == true){
-        bossIcon = Config.hodEmoji ++ " "
-      }
-      val feruFinal = Config.feruBosses.contains(killer.toLowerCase())
-      if (feruFinal == true){
-        bossIcon = Config.feruEmoji ++ " "
-      }
-      val inq = Config.inqBosses.contains(killer.toLowerCase())
-      if (inq == true){
-        bossIcon = Config.inqEmoji ++ " "
-      }
-
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $bossIcon**$killer**\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
