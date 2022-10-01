@@ -87,34 +87,32 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
-
       var context = "Died"
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
-
-      // WIP
       var killerBuffer = ListBuffer[String]()
-      val killerList = charDeath.death.killers
+      val killerList = charDeath.death.killers // get all killers
       if (killerList.nonEmpty) {
-        killerList.foreach { k =>
+        killerList.foreach { k => // parse through each killer
           if (k.player == true) {
-            if (k.player != charName){
+            if (k.player != charName){ // the killer isn't yourself its a PK
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
             }
-            val isSummon = k.name.split(" of ")
+            val isSummon = k.name.split(" of ") // e.g: fire elemental of Violent Beams
             if (isSummon.length > 1){
-              if (isSummon(0).exists(_.isUpper) == false) {
+              if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
                 killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
               } else {
-                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
+                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
               }
             } else {
-              killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
+              killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
             }
           } else {
+            // custom emojis for flavour
             if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
               bossIcon = Config.nemesisEmoji ++ " "
             }
@@ -162,6 +160,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         }
       }
 
+      // convert formatted killer list to one string
+      val killerInit = killerBuffer.view.init
+      val killerText =
+        if (killerInit.nonEmpty) {
+          killerInit.mkString(", ") + " and " + killerBuffer.last
+        } else killerBuffer.headOption.getOrElse("")
+
+      // debug
+      logger.info(killerText)
+
       // check if death was by another player
       /***
       val pvp = charDeath.death.killers.head.player
@@ -171,16 +179,6 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
        embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
       }
       ***/
-
-      // convert to string
-      val killerInit = killerBuffer.view.init
-      val killerText =
-        if (killerInit.nonEmpty) {
-          killerInit.mkString(", ") + " and " + killerBuffer.last
-        } else killerBuffer.headOption.getOrElse("")
-
-      // debug
-      logger.info(killerText)
 
       // nemesis icon
       /***
