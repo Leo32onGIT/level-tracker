@@ -107,46 +107,46 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 							killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
 						}
           } else {
-						if (Config.nemesisCreatures.contains(k.name)){
+						if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
 							bossIcon = Config.nemesisEmoji ++ " "
 						}
-						if (Config.archfoeCreatures.contains(k.name)){
+						if (Config.archfoeCreatures.contains(k.name.toLowerCase())){
 							bossIcon = Config.archfoeEmoji ++ " "
 						}
-						if (Config.baneCreatures.contains(k.name)){
+						if (Config.baneCreatures.contains(k.name.toLowerCase())){
 							bossIcon = Config.baneEmoji ++ " "
 						}
-						if (Config.bossSummons.contains(k.name)){
+						if (Config.bossSummons.contains(k.name.toLowerCase())){
 							bossIcon = Config.summonEmoji ++ " "
 						}
-						if (Config.cubeBosses.contains(k.name)){
+						if (Config.cubeBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.cubeEmoji ++ " "
 						}
-						if (Config.mkBosses.contains(k.name)){
+						if (Config.mkBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.mkEmoji ++ " "
 						}
-						if (Config.svarGreenBosses.contains(k.name)){
+						if (Config.svarGreenBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.svarGreenEmoji ++ " "
 						}
-						if (Config.svarScrapperBosses.contains(k.name)){
+						if (Config.svarScrapperBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.svarScrapperEmoji ++ " "
 						}
-						if (Config.svarWarlordBosses.contains(k.name)){
+						if (Config.svarWarlordBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.svarWarlordEmoji ++ " "
 						}
-						if (Config.zelosBosses.contains(k.name)){
+						if (Config.zelosBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.zelosEmoji ++ " "
 						}
-						if (Config.libBosses.contains(k.name)){
+						if (Config.libBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.libEmoji ++ " "
 						}
-						if (Config.hodBosses.contains(k.name)){
+						if (Config.hodBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.hodEmoji ++ " "
 						}
-						if (Config.feruBosses.contains(k.name)){
+						if (Config.feruBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.feruEmoji ++ " "
 						}
-						if (Config.inqBosses.contains(k.name)){
+						if (Config.inqBosses.contains(k.name.toLowerCase())){
 							bossIcon = Config.inqEmoji ++ " "
 						}
             killerBuffer += s"$bossIcon**${k.name}**"
@@ -162,7 +162,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         } else killerBuffer.headOption.getOrElse("")
 
       // debug
-      //logger.info(killerText)
+      logger.info(killerText)
 
       // nemesis icon
 			/***
