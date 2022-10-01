@@ -88,71 +88,89 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
 
-			var embedThumbnail = creatureImageUrl(killer)
-			var bossIcon = ""
+      var context = "Died"
+      var embedColor = 3092790 // background default
+      var embedThumbnail = creatureImageUrl(killer)
+      var bossIcon = ""
+
       // WIP
       var killerBuffer = ListBuffer[String]()
       val killerList = charDeath.death.killers
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
           if (k.player == true) {
-						val isSummon = k.name.split(" of ")
-						if (isSummon.length > 1){
-							if (isSummon(0).exists(_.isUpper) == false) {
-								killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
-							} else {
-								killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
-							}
-						} else {
-							killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
-						}
+            if (k.player != charName){
+              context = "Killed"
+              embedColor = 14869218 // bone white
+              embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
+            }
+            val isSummon = k.name.split(" of ")
+            if (isSummon.length > 1){
+              if (isSummon(0).exists(_.isUpper) == false) {
+                killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+              } else {
+                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
+              }
+            } else {
+              killerBuffer += s"**[${k.name}](${charUrl(k.name)})**"
+            }
           } else {
-						if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
-							bossIcon = Config.nemesisEmoji ++ " "
-						}
-						if (Config.archfoeCreatures.contains(k.name.toLowerCase())){
-							bossIcon = Config.archfoeEmoji ++ " "
-						}
-						if (Config.baneCreatures.contains(k.name.toLowerCase())){
-							bossIcon = Config.baneEmoji ++ " "
-						}
-						if (Config.bossSummons.contains(k.name.toLowerCase())){
-							bossIcon = Config.summonEmoji ++ " "
-						}
-						if (Config.cubeBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.cubeEmoji ++ " "
-						}
-						if (Config.mkBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.mkEmoji ++ " "
-						}
-						if (Config.svarGreenBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.svarGreenEmoji ++ " "
-						}
-						if (Config.svarScrapperBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.svarScrapperEmoji ++ " "
-						}
-						if (Config.svarWarlordBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.svarWarlordEmoji ++ " "
-						}
-						if (Config.zelosBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.zelosEmoji ++ " "
-						}
-						if (Config.libBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.libEmoji ++ " "
-						}
-						if (Config.hodBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.hodEmoji ++ " "
-						}
-						if (Config.feruBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.feruEmoji ++ " "
-						}
-						if (Config.inqBosses.contains(k.name.toLowerCase())){
-							bossIcon = Config.inqEmoji ++ " "
-						}
+            if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.nemesisEmoji ++ " "
+            }
+            if (Config.archfoeCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.archfoeEmoji ++ " "
+            }
+            if (Config.baneCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.baneEmoji ++ " "
+            }
+            if (Config.bossSummons.contains(k.name.toLowerCase())){
+              bossIcon = Config.summonEmoji ++ " "
+            }
+            if (Config.cubeBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.cubeEmoji ++ " "
+            }
+            if (Config.mkBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.mkEmoji ++ " "
+            }
+            if (Config.svarGreenBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarGreenEmoji ++ " "
+            }
+            if (Config.svarScrapperBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarScrapperEmoji ++ " "
+            }
+            if (Config.svarWarlordBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarWarlordEmoji ++ " "
+            }
+            if (Config.zelosBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.zelosEmoji ++ " "
+            }
+            if (Config.libBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.libEmoji ++ " "
+            }
+            if (Config.hodBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.hodEmoji ++ " "
+            }
+            if (Config.feruBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.feruEmoji ++ " "
+            }
+            if (Config.inqBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.inqEmoji ++ " "
+            }
             killerBuffer += s"$bossIcon**${k.name}**"
           }
         }
       }
+
+      // check if death was by another player
+      /***
+      val pvp = charDeath.death.killers.head.player
+      if (pvp == true) {
+       context = "Killed"
+       embedColor = 14869218 // bone white
+       embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
+      }
+      ***/
 
       // convert to string
       val killerInit = killerBuffer.view.init
@@ -165,7 +183,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       logger.info(killerText)
 
       // nemesis icon
-			/***
+      /***
       val nemesis = Config.nemesisCreatures.contains(killer.toLowerCase())
       if (nemesis == true){
         bossIcon = Config.nemesisEmoji ++ " "
@@ -185,10 +203,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (bosssummon == true){
         bossIcon = Config.summonEmoji ++ " "
       }
-			***/
+      ***/
 
-			/***
-			// quests
+      /***
+      // quests
       val cubeQuest = Config.cubeBosses.contains(killer.toLowerCase())
       if (cubeQuest == true){
         bossIcon = Config.cubeEmoji ++ " "
@@ -229,23 +247,13 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (inq == true){
         bossIcon = Config.inqEmoji ++ " "
       }
-			***/
+      ***/
 
       // guild rank and name
-      var embedColor = 3092790 // background default
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
       var guildText = ":x: **No Guild**\n"
-
-      // check if death was by another player
-      val pvp = charDeath.death.killers.head.player
-      var context = "Died"
-      if (pvp == true) {
-         context = "Killed"
-         embedColor = 14869218 // bone white
-         embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
-      }
 
       // guild
       // does player have guild?
