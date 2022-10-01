@@ -180,7 +180,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       if (exivaBuffer.nonEmpty) {
           exivaBuffer.foreach { exiva =>
-          exivaList += s"""\n`exiva "$exiva"`"""
+          exivaList += s"""`exiva "$exiva"`\n"""
         }
       }
       // convert formatted killer list to one string
@@ -234,13 +234,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
-      new EmbedBuilder()
-        .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
-        .setDescription(embedText)
-        .setThumbnail(embedThumbnail)
-        .setColor(embedColor)
-        .build()
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>"
+      val embed = new EmbedBuilder()
+      embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
+      embed.setDescription(embedText)
+      if (exivaList != "") {
+        embed.addField("", exivaList, true)
+      }
+      embed.setThumbnail(embedThumbnail)
+      embed.setColor(embedColor)
+      embed.build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
