@@ -134,7 +134,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 						if (Config.svarWarlordBosses.contains(k.name)){
 							bossIcon = Config.svarWarlordEmoji ++ " "
 						}
-						if (Config.zelosBosse.contains(k.name)){
+						if (Config.zelosBosses.contains(k.name)){
 							bossIcon = Config.zelosEmoji ++ " "
 						}
 						if (Config.libBosses.contains(k.name)){
