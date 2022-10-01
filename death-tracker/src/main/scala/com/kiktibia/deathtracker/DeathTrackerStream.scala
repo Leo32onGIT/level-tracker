@@ -156,7 +156,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
             if (Config.inqBosses.contains(k.name.toLowerCase())){
               bossIcon = Config.inqEmoji ++ " "
             }
-            if (!(k.name.isUpper)){
+            if (!(k.name.exists(_.isUpper))){
               vowelCheck = k.name.take(1) match {
                 case "a" => "an "
                 case "e" => "an "
