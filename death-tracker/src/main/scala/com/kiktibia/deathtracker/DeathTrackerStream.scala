@@ -93,8 +93,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var bossIcon = ""
       var vowelCheck = "" // this is for adding "an" or "a" in front of creature names
       var killerBuffer = ListBuffer[String]()
-  var exivaBuffer = ListBuffer[String]()
-  var exivaList = ""
+      var exivaBuffer = ListBuffer[String]()
+      var exivaList = ""
       val killerList = charDeath.death.killers // get all killers
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
@@ -107,14 +107,14 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
               if (isSummon.length > 1){
                 if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
                   killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
-  exivaBuffer += isSummon(1)
+                  exivaBuffer += isSummon(1)
                 } else {
                   killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
-  exivaBuffer += k.name
+                  exivaBuffer += k.name
                 }
               } else {
                 killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
-  exivaBuffer += k.name
+                exivaBuffer += k.name
               }
             }
           } else {
@@ -179,8 +179,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       if (exivaBuffer.nonEmpty) {
-          exivaBuffer.foreach { exiva =>
-          exivaList += s"""`exiva "$exiva"`\n"""
+        exivaBuffer.zipWithIndex.foreach { (i,exiva) =>
+          if (i == 0){
+            exivaList += s"""<:exiva:1025866744918716416>\t`exiva "$exiva"`\n"""
+          } else {
+            exivaList += s"""\t\t`exiva "$exiva"`\n"""
+          }
         }
       }
       // convert formatted killer list to one string
@@ -234,13 +238,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
       val embed = new EmbedBuilder()
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
-      if (exivaList != "") {
-        embed.addField("<:exiva:1025866744918716416>", exivaList, true) // testing
-      }
       embed.setThumbnail(embedThumbnail)
       embed.setColor(embedColor)
       embed.build()
