@@ -96,7 +96,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (killerList.nonEmpty) {
         killerList.foreach { k => // parse through each killer
           if (k.player == true) {
-            if (k.player != charName){ // the killer isn't yourself its a PK
+            if (k.name != charName){ // the killer isn't yourself its a PK
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
