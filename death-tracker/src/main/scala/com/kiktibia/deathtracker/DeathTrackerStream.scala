@@ -91,6 +91,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
+      var vowelCheck = ""
       var killerBuffer = ListBuffer[String]()
       val killerList = charDeath.death.killers // get all killers
       if (killerList.nonEmpty) {
@@ -155,7 +156,17 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
             if (Config.inqBosses.contains(k.name.toLowerCase())){
               bossIcon = Config.inqEmoji ++ " "
             }
-            killerBuffer += s"$bossIcon**${k.name}**"
+            if (!(k.name.isUpper)){
+              vowelCheck = k.name.take(1) match {
+                case "a" => "an "
+                case "e" => "an "
+                case "i" => "an "
+                case "o" => "an "
+                case "u" => "an "
+                case _ => "a "
+              }
+            }
+            killerBuffer += s"$vowelCheck$bossIcon**${k.name}**"
           }
         }
       }
@@ -168,7 +179,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         } else killerBuffer.headOption.getOrElse("")
 
       // debug
-      logger.info(killerText)
+      //logger.info(killerText)
 
       // check if death was by another player
       /***
@@ -291,7 +302,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>"
       new EmbedBuilder()
         .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
         .setDescription(embedText)
