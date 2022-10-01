@@ -239,7 +239,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
       if (exivaList != "") {
-        embed.addField("<:exiva:1025866744918716416>", exivaList, true)
+        embed.addField("<:exiva:1025866744918716416>", exivaList, true) // testing
       }
       embed.setThumbnail(embedThumbnail)
       embed.setColor(embedColor)
