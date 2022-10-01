@@ -91,13 +91,13 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl(killer)
       var bossIcon = ""
-      var vowelCheck = ""
+      var vowelCheck = "" // this is for adding "an" or "a" in front of creature names
       var killerBuffer = ListBuffer[String]()
       val killerList = charDeath.death.killers // get all killers
       if (killerList.nonEmpty) {
-        killerList.foreach { k => // parse through each killer
+        killerList.foreach { k =>
           if (k.player == true) {
-            if (k.name != charName){ // the killer isn't yourself its a PK
+            if (k.name != charName){ // ignore 'self' entries on deathlist
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
@@ -156,6 +156,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
             if (Config.inqBosses.contains(k.name.toLowerCase())){
               bossIcon = Config.inqEmoji ++ " "
             }
+            // add "an" or "a" depending on first letter of creatures name
+            // ignore capitalized names (nouns) as they are bosses
             if (!(k.name.exists(_.isUpper))){
               vowelCheck = k.name.take(1) match {
                 case "a" => "an "
