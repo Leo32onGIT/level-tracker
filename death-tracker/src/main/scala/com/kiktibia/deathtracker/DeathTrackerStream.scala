@@ -181,7 +181,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (exivaBuffer.nonEmpty) {
         exivaBuffer.zipWithIndex.foreach { case (exiva, i) =>
           if (i == 0){
-            exivaList += s"""<:exiva:1025866744918716416>`exiva "$exiva"`""" // add exiva emoji
+            exivaList += s"""\n<:exiva:1025866744918716416>`exiva "$exiva"`""" // add exiva emoji
           } else {
             exivaList += s"""\n<:indent:1025915320285798451>`exiva "$exiva"`""" // just use indent emoji for further player names
           }
@@ -238,13 +238,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
 
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
       val embed = new EmbedBuilder()
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
-      if (exivaList != ""){
-        embed.addField("\u200B", exivaList, true)
-      }
       embed.setThumbnail(embedThumbnail)
       embed.setColor(embedColor)
       embed.build()
