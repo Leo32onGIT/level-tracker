@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.TextChannel
 import java.time.ZonedDateTime
 import scala.collection.immutable.HashMap
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.jdk.CollectionConverters._
@@ -73,7 +74,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
+
     // Filter only the interesting deaths (nemesis bosses, rare bestiary)
+    /***
     val (notableDeaths, normalDeaths) = charDeaths.toList.partition { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
     }
@@ -84,19 +87,180 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     normalDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
 
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
+    ***/
+
+    var notablePoke = ""
+    val embeds = charDeaths.toList.sortBy(_.death.time).map { charDeath =>
       val charName = charDeath.char.characters.character.name
       val killer = charDeath.death.killers.last.name
+      var context = "Died"
+      var embedColor = 3092790 // background default
+      var embedThumbnail = creatureImageUrl(killer)
+      var bossIcon = ""
+      var vowelCheck = "" // this is for adding "an" or "a" in front of creature names
+      var killerBuffer = ListBuffer[String]()
+      var exivaBuffer = ListBuffer[String]()
+      var exivaList = ""
+      val killerList = charDeath.death.killers // get all killers
+      if (killerList.nonEmpty) {
+        killerList.foreach { k =>
+          if (k.player == true) {
+            if (k.name != charName){ // ignore 'self' entries on deathlist
+              context = "Killed"
+              embedColor = 14869218 // bone white
+              embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
+              val isSummon = k.name.split(" of ") // e.g: fire elemental of Violent Beams
+              if (isSummon.length > 1){
+                if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
+                  killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+                  exivaBuffer += isSummon(1)
+                } else {
+                  killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
+                  exivaBuffer += k.name
+                }
+              } else {
+                killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // summon not detected
+                exivaBuffer += k.name
+              }
+            }
+          } else {
+            // custom emojis for flavour - ill convert this to a foreach when im not lazy
+            if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.nemesisEmoji ++ " "
+            }
+            if (Config.archfoeCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.archfoeEmoji ++ " "
+            }
+            if (Config.baneCreatures.contains(k.name.toLowerCase())){
+              bossIcon = Config.baneEmoji ++ " "
+            }
+            if (Config.bossSummons.contains(k.name.toLowerCase())){
+              bossIcon = Config.summonEmoji ++ " "
+            }
+            if (Config.cubeBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.cubeEmoji ++ " "
+            }
+            if (Config.mkBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.mkEmoji ++ " "
+            }
+            if (Config.svarGreenBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarGreenEmoji ++ " "
+            }
+            if (Config.svarScrapperBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarScrapperEmoji ++ " "
+            }
+            if (Config.svarWarlordBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.svarWarlordEmoji ++ " "
+            }
+            if (Config.zelosBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.zelosEmoji ++ " "
+            }
+            if (Config.libBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.libEmoji ++ " "
+            }
+            if (Config.hodBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.hodEmoji ++ " "
+            }
+            if (Config.feruBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.feruEmoji ++ " "
+            }
+            if (Config.inqBosses.contains(k.name.toLowerCase())){
+              bossIcon = Config.inqEmoji ++ " "
+            }
+            // add "an" or "a" depending on first letter of creatures name
+            // ignore capitalized names (nouns) as they are bosses
+            if (!(k.name.exists(_.isUpper))){
+              vowelCheck = k.name.take(1) match {
+                case "a" => "an "
+                case "e" => "an "
+                case "i" => "an "
+                case "o" => "an "
+                case "u" => "an "
+                case _ => "a "
+              }
+            }
+            killerBuffer += s"$vowelCheck$bossIcon**${k.name}**"
+          }
+        }
+      }
+
+      if (exivaBuffer.nonEmpty) {
+        exivaBuffer.zipWithIndex.foreach { case (exiva, i) =>
+          if (i == 0){
+            exivaList += s"""\n<:exiva:1025866744918716416>`exiva "$exiva"`""" // add exiva emoji
+          } else {
+            exivaList += s"""\n<:indent:1025915320285798451>`exiva "$exiva"`""" // just use indent emoji for further player names
+          }
+        }
+      }
+      // convert formatted killer list to one string
+      val killerInit = killerBuffer.view.init
+      val killerText =
+        if (killerInit.nonEmpty) {
+          killerInit.mkString(", ") + " and " + killerBuffer.last
+        } else killerBuffer.headOption.getOrElse("")
+
+      // guild rank and name
+      val guild = charDeath.char.characters.character.guild
+      val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+      val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
+      var guildText = ":x: **No Guild**\n"
+
+      // guild
+      // does player have guild?
+      var guildIcon = Config.otherGuild
+      if (guildName != "") {
+        // is player an ally
+        val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
+        if (allyGuilds == true){
+          embedColor = 13773097 // bright red
+          guildIcon = Config.allyGuild
+        }
+        // is player in hunted guild
+        val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
+        if (huntedGuilds == true){
+          embedColor = 36941 // bright green
+        }
+        guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+      }
+
+      // player
+      // ally player
+      val allyPlayers = Config.allyPlayers.contains(charName.toLowerCase())
+      if (allyPlayers == true){
+        embedColor = 13773097 // bright red
+      }
+      // hunted player
+      val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
+      if (huntedPlayers == true){
+        embedColor = 36941 // bright green
+      }
+
+      // poke if killer is in notable-creatures config
+      val poke = Config.notableCreatures.contains(killer.toLowerCase())
+      if (poke == true) {
+        notablePoke = Config.notableRole
+        embedColor = 4922769 // bright purple
+      }
+
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
-      new EmbedBuilder()
-        .setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
-        .setDescription(s"Killed at level ${charDeath.death.level.toInt} by **$killer**\nKilled at <t:$epochSecond>")
-        .setThumbnail(creatureImageUrl(killer))
-        .setColor(13773097)
-        .build()
+
+      // this is the actual embed description
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
+
+      val embed = new EmbedBuilder()
+      embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
+      embed.setDescription(embedText)
+      embed.setThumbnail(embedThumbnail)
+      embed.setColor(embedColor)
+      embed.build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
       deathsChannel.sendMessageEmbeds(embed).queue()
+    }
+    if (notablePoke != ""){
+      deathsChannel.sendMessage(notablePoke).queue();
     }
     cleanUp()
 
