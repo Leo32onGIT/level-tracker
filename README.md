@@ -11,8 +11,7 @@ It is currently configured for [Seanera](https://github.com/Leo32onGIT/death-tra
 
 ![examples](https://i.imgur.com/nMJK05h.gif)
 
-It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L23) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L24-L94).    
-You will need to change these to **ones that exist** on your discord server.
+It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L23) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L24-L94).
 
 ![tracked boss](https://i.imgur.com/Tjofi3h.png)
 
