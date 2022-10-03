@@ -2,6 +2,11 @@
 
 Discord bot to track when players are killed on Tibia.    
 
+# Configuration & Details
+
+Configure the tibia server that is tracked [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/tibiadata/TibiaDataClient.scala#L20).    
+You will need to point to your own discord emojis and nemesis role [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L6-L23) and [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/DeathTrackerStream.scala#L190-L194).
+
   `no color` = neutral pve    
   `white` = neutral pvp    
   `red` = ally    
@@ -14,7 +19,6 @@ It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/b
 
 ![tracked boss](https://i.imgur.com/Tjofi3h.png)
 
-You will need to point to your own discord emojis and nemesis role [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L6-L23) and [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/DeathTrackerStream.scala#L190-L194).
 # Deployment steps
 
 Build docker image  
