@@ -1,13 +1,20 @@
 # Death Tracker
 
-Discord bot to track when players are killed on Seanera.    
+Discord bot to track when players are killed on Tibia.    
+It is currently configured for [Seanera](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/tibiadata/TibiaDataClient.scala#L20).
 
-![in a guild](https://i.imgur.com/6KAvSjh.png)   
-![neutral](https://i.imgur.com/FEymk3w.png)
+  `no color` = neutral pve    
+  `white` = neutral pvp    
+  `red` = ally    
+  `green` = hunted    
+  `purple` = rare boss (this pokes)    
 
-It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/seanera/death-tracker/src/main/resources/application.conf#L5) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/seanera/death-tracker/src/main/resources/application.conf#L7).
+![examples](https://i.imgur.com/nMJK05h.gif)
 
-![tracked boss](https://i.imgur.com/cXF8r8j.png)
+It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L23) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L24-L94).    
+You will need to change these to **ones that exist** on your discord server.
+
+![tracked boss](https://i.imgur.com/Tjofi3h.png)
 
 # Deployment steps
 
