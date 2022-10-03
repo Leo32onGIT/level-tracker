@@ -118,7 +118,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
               }
             }
           } else {
-            // custom emojis for flavour
+            // custom emojis for flavour - ill convert this to a foreach when im not lazy
             if (Config.nemesisCreatures.contains(k.name.toLowerCase())){
               bossIcon = Config.nemesisEmoji ++ " "
             }
@@ -241,7 +241,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
       // this is the actual embed description
       val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond>$exivaList"
-      
+
       val embed = new EmbedBuilder()
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
