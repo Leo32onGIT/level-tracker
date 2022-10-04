@@ -222,7 +222,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         if (huntedGuilds == true){
           embedColor = 36941 // bright green
           if (context == "Died" && charDeath.death.level.toInt >= 250) {
-            notablePoke = Config.inqBlessRole} // PVE fullbless opportuniy (only poke for level 250+)
+            notablePoke = Config.inqBlessRole // PVE fullbless opportuniy (only poke for level 250+)
           }
         }
         guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
