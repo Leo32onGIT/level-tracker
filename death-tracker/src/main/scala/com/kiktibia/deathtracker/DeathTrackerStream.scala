@@ -39,7 +39,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   }
   private val logAndResume: Attributes = supervisionStrategy(logAndResumeDecider)
 
-  private lazy val sourceTick = Source.tick(2.seconds, 15.seconds, ()) // im kinda cow-boying it here
+  private lazy val sourceTick = Source.tick(2.seconds, 20.seconds, ()) // im kinda cow-boying it here
 
   private lazy val getWorld = Flow[Unit].mapAsync(1) { _ =>
     logger.info("Running stream")
@@ -52,7 +52,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => CharKey(i, now))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
-    Source(charsToCheck).mapAsyncUnordered(64)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
+    Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
 
   private lazy val scanForDeaths = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
