@@ -253,13 +253,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context at <t:$epochSecond:R>$exivaList"
+      val embedText = s"$guildText$context at level ${charDeath.death.level.toInt} by $killerText.\n$context <t:$epochSecond:R>$exivaList"
 
       val embed = new EmbedBuilder()
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
       embed.setThumbnail(embedThumbnail)
-      embed.setFooter(s"<t:$epochSecond:R>")
       embed.setColor(embedColor)
       embed.build()
     }
