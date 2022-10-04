@@ -39,7 +39,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   }
   private val logAndResume: Attributes = supervisionStrategy(logAndResumeDecider)
 
-  private lazy val sourceTick = Source.tick(2.seconds, 15.seconds, ())
+  private lazy val sourceTick = Source.tick(2.seconds, 15.seconds, ()) // im kinda cow-boying it here
 
   private lazy val getWorld = Flow[Unit].mapAsync(1) { _ =>
     logger.info("Running stream")

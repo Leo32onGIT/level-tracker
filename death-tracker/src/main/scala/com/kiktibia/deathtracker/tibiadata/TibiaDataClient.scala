@@ -30,7 +30,7 @@ class TibiaDataClient extends JsonSupport with StrictLogging {
 
   def getCharacter(name: String): Future[CharacterResponse] = {
 
-    // attempt to fool cache
+    // yeehaw
     var obfsName = ""
     val rand = scala.util.Random
     name.toLowerCase.foreach { letter =>
