@@ -259,7 +259,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       embed.setTitle(s"$charName ${vocEmoji(charDeath.char)}", charUrl(charName))
       embed.setDescription(embedText)
       embed.setThumbnail(embedThumbnail)
-      embed.setFooter(s"<R:$epochSecond>")
+      embed.setFooter(s"<t:$epochSecond:R>")
       embed.setColor(embedColor)
       embed.build()
     }
