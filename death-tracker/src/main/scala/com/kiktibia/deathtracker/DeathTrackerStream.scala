@@ -52,7 +52,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => CharKey(i, now))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
-    Source(charsToCheck).mapAsyncUnordered(16)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
+    Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
 
   private lazy val scanForDeaths = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
@@ -76,16 +76,17 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
 
     // Filter only the interesting deaths (nemesis bosses, rare bestiary)
-    /***
     val (notableDeaths, normalDeaths) = charDeaths.toList.partition { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
     }
 
+    // logging
     logger.info(s"New notable deaths: ${notableDeaths.length}")
     notableDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
     logger.info(s"New normal deaths: ${normalDeaths.length}")
     normalDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
 
+    /***
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
 
@@ -220,6 +221,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
         if (huntedGuilds == true){
           embedColor = 36941 // bright green
+          if (context == "Died" && charDeath.death.level.toInt >= 250) {
+            notablePoke = s"${Config.inqBlessRole} **$charName** | $guildName | ${charDeath.death.level.toInt} ${vocEmoji(charDeath.char)}" // PVE fullbless opportuniy (only poke for level 250+)
+          }
         }
         guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
       }
@@ -234,6 +238,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
       if (huntedPlayers == true){
         embedColor = 36941 // bright green
+        if (context == "Died") {
+          notablePoke = s"${Config.inqBlessRole} **$charName** | *Hunted* | ${charDeath.death.level.toInt} ${vocEmoji(charDeath.char)}" // PVE fullbless opportuniy
+        }
       }
 
       // poke if killer is in notable-creatures config
