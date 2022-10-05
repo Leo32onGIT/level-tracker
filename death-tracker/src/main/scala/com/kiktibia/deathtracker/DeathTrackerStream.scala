@@ -107,9 +107,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
           if (k.player == true) {
-            if (k.name == charName) {
-              killerBuffer += ""
-            } else { // ignore 'self' entries on deathlist
+            if (k.name != charName){ // ignore 'self' entries on deathlist
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
@@ -206,7 +204,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         }
       }
       // convert formatted killer list to one string
-      val killerInit = killerBuffer.view.init.getOrElse(ListBuffer.empty)
+      val killerInit = if (killerBuffer.nonEmpty) killerBuffer.view.init else None
       val killerText =
         if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
