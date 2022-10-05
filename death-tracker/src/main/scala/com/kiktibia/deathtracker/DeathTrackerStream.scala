@@ -208,8 +208,8 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val killerText =
         if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
-        } else killerBuffer.headOption.getOrElse(s"""`suiciding on a bomb?`""")
-        
+        } else killerBuffer.headOption.getOrElse(s"""`suiciding on a bomb`""")
+
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
