@@ -210,6 +210,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
           killerInit.mkString(", ") + " and " + killerBuffer.last
         } else killerBuffer.headOption.getOrElse("")
 
+      if (killerText == "" && killer == charName) {
+        embedThumbnail = creatureImageUrl("Red_Skull_(Item)")
+        killerText = s"""`suiciding on a bomb?`""" // this should only trigger to suicides on a bomb on open or 100->0 friendly fire on retro/hardcore
+      }
+
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
