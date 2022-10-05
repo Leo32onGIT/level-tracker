@@ -205,10 +205,16 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       }
       // convert formatted killer list to one string
       val killerInit = if (killerBuffer.nonEmpty) killerBuffer.view.init else None
-      val killerText =
+      var killerText =
         if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
-        } else killerBuffer.headOption.getOrElse(s"""`suiciding on a bomb`""")
+        } else killerBuffer.headOption.getOrElse("")
+
+      // this should only occur to pure suicides on bomb runes, or pure 'assists' deaths in yellow-skull friendy fire or retro/hardcore situations
+      if (killerText == ""){
+          embedThumbnail = creatureImageUrl("Red_Skull_(Item)")
+          killerText = s"""`suicide`"""
+      }
 
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
