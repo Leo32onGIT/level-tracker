@@ -75,6 +75,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharDeath]].mapAsync(1) { charDeaths =>
 
+    /***
     // Filter only the interesting deaths (nemesis bosses, rare bestiary)
     val (notableDeaths, normalDeaths) = charDeaths.toList.partition { charDeath =>
       Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
@@ -86,7 +87,7 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
     logger.info(s"New normal deaths: ${normalDeaths.length}")
     normalDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
 
-    /***
+
     val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
     ***/
 
