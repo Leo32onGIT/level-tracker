@@ -113,7 +113,15 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
               val isSummon = k.name.split(" of ") // e.g: fire elemental of Violent Beams
               if (isSummon.length > 1){
                 if (isSummon(0).exists(_.isUpper) == false) { // summons will be lowercase, a player with " of " in their name will have a capital letter
-                  killerBuffer += s"${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
+                  val vowel = isSummon(0).take(1) match {
+                  case "a" => "an"
+                  case "e" => "an"
+                  case "i" => "an"
+                  case "o" => "an"
+                  case "u" => "an"
+                  case _ => "a"
+                  }
+                  killerBuffer += s"$vowel ${Config.summonEmoji} **${isSummon(0)} of [${isSummon(1)}](${charUrl(isSummon(1))})**"
                   exivaBuffer += isSummon(1)
                 } else {
                   killerBuffer += s"**[${k.name}](${charUrl(k.name)})**" // player with " of " in the name e.g: Knight of Flame
