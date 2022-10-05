@@ -208,7 +208,10 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       val killerText =
         if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
-        } else killerBuffer.headOption.getOrElse("")
+        } else {
+          embedThumbnail = creatureImageUrl("Red_Skull_(Item)")
+          killerBuffer.headOption.getOrElse(s"""||`friendly fire`||""")
+        } // this should only trigger for suiciding on bomb runes or w/e
 
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
