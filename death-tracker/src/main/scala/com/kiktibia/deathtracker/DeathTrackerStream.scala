@@ -107,7 +107,9 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
       if (killerList.nonEmpty) {
         killerList.foreach { k =>
           if (k.player == true) {
-            if (k.name != charName){ // ignore 'self' entries on deathlist
+            if (k.name == charName) {
+              killerBuffer += ""
+            } else { // ignore 'self' entries on deathlist
               context = "Killed"
               embedColor = 14869218 // bone white
               embedThumbnail = creatureImageUrl("Phantasmal_Ooze")
@@ -204,19 +206,11 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         }
       }
       // convert formatted killer list to one string
-      val killerInit =
-          if (!(killerBuffer.isEmpty)) {
-            killerBuffer.view.init
-          } else None
-      var killerText =
-        if (!(killerInit.nonEmpty)) {
+      val killerInit = killerBuffer.view.init.getOrElse(ListBuffer.empty)
+      val killerText =
+        if (killerInit.nonEmpty) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
         } else killerBuffer.headOption.getOrElse("")
-
-      if (killerText == "" && killer == charName) {
-        embedThumbnail = creatureImageUrl("Red_Skull_(Item)")
-        killerText = s"""`suiciding on a bomb?`""" // this should only trigger to suicides on a bomb on open or 100->0 friendly fire on retro/hardcore
-      }
 
       // guild rank and name
       val guild = charDeath.char.characters.character.guild
