@@ -204,9 +204,12 @@ class DeathTrackerStream(deathsChannel: TextChannel)(implicit ex: ExecutionConte
         }
       }
       // convert formatted killer list to one string
-      val killerInit = killerBuffer.view.init
+      val killerInit =
+          if (!(killerBuffer.isEmpty)) {
+            killerBuffer.view.init
+          } else None
       var killerText =
-        if (killerInit.nonEmpty) {
+        if (!(killerInit.nonEmpty)) {
           killerInit.mkString(", ") + " and " + killerBuffer.last
         } else killerBuffer.headOption.getOrElse("")
 
