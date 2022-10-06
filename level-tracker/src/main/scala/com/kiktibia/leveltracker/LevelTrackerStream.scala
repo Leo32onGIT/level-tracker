@@ -30,7 +30,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private val tibiaDataClient = new TibiaDataClient()
 
-  private val LevelRecentDuration = 30 * 60 // 30 minutes for a death to count as recent enough to be worth notifying
+  private val levelRecentDuration = 30 * 60 // 30 minutes for a death to count as recent enough to be worth notifying
   private val onlineRecentDuration = 10 * 60 // 10 minutes for a character to still be checked for deaths after logging off
 
   private val logAndResumeDecider: Supervision.Decider = { e =>
