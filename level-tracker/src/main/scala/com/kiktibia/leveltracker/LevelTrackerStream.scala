@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
 class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
-  case class CharKey(char: String, time: ZonedDateTime)
+  case class CharKey(char: String, level: Levels)
 
   case class CharLevel(char: CharacterResponse, level: Levels)
 
@@ -50,7 +50,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val now = ZonedDateTime.now()
     val online: List[String] = worldResponse.worlds.world.online_players.map(_.name)
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
-    recentOnline.addAll(online.map(i => CharKey(i, now))) // ...and add them again, with an updated online time
+    recentOnline.addAll(online.map(i => CharKey(i, List(Levels(now, worldResponse.worlds.world.online_players.map(_.level).toInt))))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
@@ -60,12 +60,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val newLevels = characterResponses.flatMap { char =>
       val levels: List[Levels] = List(Levels(char.characters.character.last_login.getOrElse(""), char.characters.character.level.toInt))
       levels.flatMap { level =>
-        val levelTime = ZonedDateTime.parse(level.time)
-        val levelAge = java.time.Duration.between(levelTime, now).getSeconds
-        val charLevel = CharKey(char.characters.character.name, levelTime)
-        if (levelAge < levelRecentDuration && !recentLevels.contains(charLevel)) {
+        val charLevel = CharKey(char.characters.character.name, List(Levels(now, level.level.toInt + 1)))
+        if (recentOnline.contains(charLevel)) {
           recentLevels.add(charLevel)
-          Some(CharLevel(char, level))
+					Some(CharLevel(char, charLevel.level))
         }
         else None
       }
@@ -168,11 +166,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private def cleanUp(): Unit = {
     val now = ZonedDateTime.now()
     recentOnline.filterInPlace { i =>
-      val diff = java.time.Duration.between(i.time, now).getSeconds
+      val diff = java.time.Duration.between(i.level.time, now).getSeconds
       diff < onlineRecentDuration
     }
     recentLevels.filterInPlace { i =>
-      val diff = java.time.Duration.between(i.time, now).getSeconds
+      val diff = java.time.Duration.between(i.level.time, now).getSeconds
       diff < levelRecentDuration
     }
   }
