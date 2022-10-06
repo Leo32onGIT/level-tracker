@@ -1,6 +1,6 @@
 ThisBuild / version := "1.1.0-SNAPSHOT"
 
-name := "death-tracker"
+name := "level-tracker"
 
 version := "0.1"
 
