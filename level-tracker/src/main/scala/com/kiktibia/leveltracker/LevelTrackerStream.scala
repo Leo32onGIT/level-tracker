@@ -95,7 +95,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val embeds = charLevels.toList.sortBy(_.level.time).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
-      var embedThumbnail = creatureImageUrl(killer)
+      var embedThumbnail = creatureImageUrl("hunter")
 
       // guild rank and name
       val guild = charLevel.char.characters.character.guild
