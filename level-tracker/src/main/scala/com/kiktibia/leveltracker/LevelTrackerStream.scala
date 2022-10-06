@@ -58,7 +58,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
-      val levels: List[Levels] = (char.characters.character.last_login, char.characters.character.level)
+      val levels: List[Levels] = List(char.characters.character.last_login, char.characters.character.level)
       levels.flatMap { level =>
         val levelTime = ZonedDateTime.parse(level.time)
         val levelAge = java.time.Duration.between(levelTime, now).getSeconds
