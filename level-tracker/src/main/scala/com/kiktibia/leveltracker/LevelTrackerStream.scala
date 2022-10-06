@@ -39,7 +39,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }
   private val logAndResume: Attributes = supervisionStrategy(logAndResumeDecider)
 
-  private lazy val sourceTick = Source.tick(2.seconds, 20.seconds, ()) // im kinda cow-boying it here
+  private lazy val sourceTick = Source.tick(2.seconds, 60.seconds, ()) // im kinda cow-boying it here
 
   private lazy val getWorld = Flow[Unit].mapAsync(1) { _ =>
     logger.info("Running stream")
@@ -58,7 +58,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
-      val levels: List[Levels] = List(Levels(char.characters.character.last_login.toString, char.characters.character.level.toInt))
+      val levels: List[Levels] = List(Levels(char.characters.character.last_login, char.characters.character.level))
       levels.flatMap { level =>
         val levelTime = ZonedDateTime.parse(level.time)
         val levelAge = java.time.Duration.between(levelTime, now).getSeconds
