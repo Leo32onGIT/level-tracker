@@ -50,7 +50,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val now = ZonedDateTime.now()
     val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, Levels(now.toString, i.level)))
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
-    recentOnline.addAll(online.map(i => CharKey(i.level.name, Levels(now.toString, i.level.level)))) // ...and add them again, with an updated online time
+    recentOnline.addAll(online.map(i => CharKey(i.char, Levels(now.toString, i.level.level)))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
