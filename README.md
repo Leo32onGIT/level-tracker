@@ -1,23 +1,10 @@
-# Death Tracker
+# Level Tracker
 
-Discord bot to track when players are killed on Tibia.    
-
-# Configuration & Details
-
-Configure the tibia server that is tracked [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/tibiadata/TibiaDataClient.scala#L20).    
-You will need to point to your own discord emojis and nemesis role [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L6-L23) and [here](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/DeathTrackerStream.scala#L190-L194).
-
-  `no color` = neutral pve    
-  `white` = neutral pvp    
+Discord bot to track when players gain levels.    
+It is currently configured for Seanera.
+  
   `red` = ally    
-  `green` = hunted    
-  `purple` = rare boss (this pokes)    
-
-![examples](https://i.imgur.com/nMJK05h.gif)
-
-It will also poke a [discord role](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L23) if someone dies to a [tracked monster](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/resources/application.conf#L24-L94).
-
-![tracked boss](https://i.imgur.com/Tjofi3h.png)
+  `green` = hunted      
 
 # Deployment steps
 

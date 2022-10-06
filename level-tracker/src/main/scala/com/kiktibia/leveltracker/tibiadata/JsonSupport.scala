@@ -1,8 +1,8 @@
-package com.kiktibia.deathtracker
+package com.kiktibia.leveltracker
 package tibiadata
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import com.kiktibia.deathtracker.tibiadata.response._
+import com.kiktibia.leveltracker.tibiadata.response._
 import org.apache.commons.text.StringEscapeUtils
 import spray.json.{DefaultJsonProtocol, JsObject, JsString, JsValue, RootJsonFormat}
 
@@ -54,5 +54,3 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 object JsonConvertNoCustomImplicits extends SprayJsonSupport with DefaultJsonProtocol {
   def convert(json: JsValue): String = json.convertTo[String]
 }
-
-
