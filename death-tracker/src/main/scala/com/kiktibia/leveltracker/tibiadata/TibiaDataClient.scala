@@ -1,4 +1,4 @@
-package com.kiktibia.deathtracker
+package com.kiktibia.leveltracker
 package tibiadata
 
 import akka.actor.ActorSystem
@@ -7,7 +7,7 @@ import akka.http.scaladsl.coding.Coders
 import akka.http.scaladsl.model.headers.HttpEncodings
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import com.kiktibia.deathtracker.tibiadata.response.{CharacterResponse, WorldResponse}
+import com.kiktibia.leveltracker.tibiadata.response.{CharacterResponse, WorldResponse}
 import com.typesafe.scalalogging.StrictLogging
 
 import scala.concurrent.{ExecutionContextExecutor, Future}

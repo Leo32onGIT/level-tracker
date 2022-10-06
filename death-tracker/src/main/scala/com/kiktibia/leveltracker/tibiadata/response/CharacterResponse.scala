@@ -1,4 +1,4 @@
-package com.kiktibia.deathtracker.tibiadata.response
+package com.kiktibia.leveltracker.tibiadata.response
 
 case class Houses(
   name: String,
@@ -34,12 +34,18 @@ case class Killers(
   traded: Boolean,
   summon: String
 )
+
 case class Deaths(
   time: String,
   level: Double,
   killers: List[Killers],
   assists: List[Killers],
   reason: String
+)
+
+case class Levels(
+  time: String,
+  level: Double
 )
 case class AccountInformation(
   position: Option[String],

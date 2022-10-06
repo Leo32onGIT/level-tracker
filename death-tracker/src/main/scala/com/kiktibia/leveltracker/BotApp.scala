@@ -1,4 +1,4 @@
-package com.kiktibia.deathtracker
+package com.kiktibia.leveltracker
 
 import akka.actor.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
@@ -21,10 +21,8 @@ object BotApp extends App with StrictLogging {
 
   private val guild: Guild = jda.getGuildById(Config.guildId)
 
-  private val deathsChannel = guild.getTextChannelById(Config.deathsChannelId)
-  private val deathTrackerStream = new DeathTrackerStream(deathsChannel)
+  private val levelsChannel = guild.getTextChannelById(Config.levelsChannelId)
+  private val levelTrackerStream = new LevelTrackerStream(levelsChannel)
 
-  deathTrackerStream.stream.run()
+  levelTrackerStream.stream.run()
 }
-
-

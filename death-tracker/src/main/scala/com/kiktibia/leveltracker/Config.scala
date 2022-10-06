@@ -1,4 +1,4 @@
-package com.kiktibia.deathtracker
+package com.kiktibia.leveltracker
 
 import com.typesafe.config.ConfigFactory
 

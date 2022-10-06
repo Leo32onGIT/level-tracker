@@ -1,4 +1,4 @@
-package com.kiktibia.deathtracker.tibiadata.response
+package com.kiktibia.leveltracker.tibiadata.response
 
 case class OnlinePlayers(
   name: String,

@@ -1,7 +1,7 @@
 # Death Tracker
 
 Discord bot to track when players are killed on Tibia.    
-It is currently configured for [Seanera](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/deathtracker/tibiadata/TibiaDataClient.scala#L20).
+It is currently configured for [Seanera](https://github.com/Leo32onGIT/death-tracker/blob/main/death-tracker/src/main/scala/com/kiktibia/leveltracker/tibiadata/TibiaDataClient.scala#L20).
 
   `no color` = neutral pve    
   `white` = neutral pvp    
