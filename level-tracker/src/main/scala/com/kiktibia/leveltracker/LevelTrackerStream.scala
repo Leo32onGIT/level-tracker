@@ -62,7 +62,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 			onlineLevel.flatMap { case (olName, olLevel, olLastLogin) =>
 				if (olName == name){
 					val charLevel = CharKey(name, olLevel, char.characters.character.last_login)
-					if (olLevel > sheetLevel && ZonedDateTime.parse(olLastLogin).toSeconds < ZonedDateTime.parse(char.characters.character.last_login.get).toSeconds && !recentLevels.contains(charLevel)) {
+					if (olLevel > sheetLevel && ZonedDateTime.parse(olLastLogin.get).toSeconds < ZonedDateTime.parse(char.characters.character.last_login.get).toSeconds && !recentLevels.contains(charLevel)) {
 						recentLevels.add(charLevel)
 						Some(CharLevel(char, olLevel))
 					}
