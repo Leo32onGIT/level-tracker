@@ -185,7 +185,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText Advanced to level **${charLevel.level.level.toInt}**."
+      val embedText = s"$guildText Advanced to level **${charLevel.level.toInt}**."
 
       val embed = new EmbedBuilder()
       embed.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
@@ -212,11 +212,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private def cleanUp(): Unit = {
     val now = ZonedDateTime.now()
     recentOnline.filterInPlace { i =>
-      val diff = java.time.Duration.between(ZonedDateTime.parse(i.level.time), now).getSeconds
+      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin), now).getSeconds
       diff < onlineRecentDuration
     }
     recentLevels.filterInPlace { i =>
-      val diff = java.time.Duration.between(ZonedDateTime.parse(i.level.time), now).getSeconds
+      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin), now).getSeconds
       diff < levelRecentDuration
     }
   }
