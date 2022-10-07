@@ -61,7 +61,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
 			val sheetLevel = char.characters.character.level
 			val name = char.characters.character.name
-			val onlineLevel: List[(String, Int)] = recentOnline.map(i => (i.char, i.level.level))
+			val onlineLevel: List[(String, Int)] = recentOnline.map(i => (i.char, i.level.level)).toList
 			onlineLevel.flatMap { ol =>
 				if (ol.char == name){
 					if (ol.level.level > sheetLevel ){
