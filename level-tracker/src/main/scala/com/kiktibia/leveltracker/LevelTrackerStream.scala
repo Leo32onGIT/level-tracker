@@ -47,7 +47,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
-    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level, Some(None)))
+    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level, None))
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => CharKey(i.char, i.level, i.lastLogin.get))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
