@@ -59,8 +59,22 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
 
-			println(char)
+			val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
+			println(Some(CharLevel(char, levels)))
+				Some(CharLevel(char, levels))
 			/***
+			deaths.flatMap { death =>
+        val deathTime = ZonedDateTime.parse(death.time)
+        val deathAge = java.time.Duration.between(deathTime, now).getSeconds
+        val charDeath = CharKey(char.characters.character.name, deathTime)
+			}
+
+        if (deathAge < deathRecentDuration && !recentDeaths.contains(charDeath)) {
+          recentDeaths.add(charDeath)
+          Some(CharDeath(char, death))
+        }
+        else None
+
 			val levels: List[CharKey] = List(Charkey(char.characters.character.name, Levels(now.toString, char.characters.character.level)))
       levels.flatMap { l =>
         logger.info(l.toString)
