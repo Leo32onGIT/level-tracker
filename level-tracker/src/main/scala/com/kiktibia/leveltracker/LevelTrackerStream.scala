@@ -72,7 +72,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         }
         else None
 				***/
-      }
     }
     Future.successful(newLevels)
   }.withAttributes(logAndResume)
