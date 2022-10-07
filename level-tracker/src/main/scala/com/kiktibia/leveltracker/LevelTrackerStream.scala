@@ -60,8 +60,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val newLevels = characterResponses.flatMap { char =>
 
 			val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
-			println(Some(CharLevel(char, levels)))
-				Some(CharLevel(char, levels))
+			levels.flatMap { level =>
+					val charLevel = CharKey(char.characters.character.name, Levels(now.toString, char.characters.character.level.toInt))
+					Some(CharLevel(char, charLevel.level))
+			}
+
 			/***
 			deaths.flatMap { death =>
         val deathTime = ZonedDateTime.parse(death.time)
