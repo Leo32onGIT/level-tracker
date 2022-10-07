@@ -58,7 +58,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
 			val sheetLevel = char.characters.character.level
-			val now = ZonedDateTime.parse(char.characters.character.last_login.toString)
+			val now = ZonedDateTime.parse(char.characters.character.last_login.get)
 			val name = char.characters.character.name
 			val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level.level)).toList
 			onlineLevel.flatMap { case (olName, olLevel) =>
