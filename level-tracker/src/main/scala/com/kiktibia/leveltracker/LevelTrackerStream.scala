@@ -63,12 +63,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 			//val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
 			// recentLevels.filterInPlace(i => !levels.contains(i.char))
 
-			val onlineLevel = recentOnline.filterInPlace(i => char.characters.character.name == i.char)
+			val onlineLevel = recentOnline.filterInPlace(i => char.characters.character.name == i.char).level
 			val charSheet = char.characters.character.level
-			val charLevel = CharKey(char.characters.character.name, Levels(now.toString, onlineLevel.last))
-			if (onlineLevel.last > charSheet && !recentLevels.contains(charLevel)){
+			val charLevel = CharKey(char.characters.character.name, Levels(now.toString, onlineLevel.level))
+			if (onlineLevel.level > charSheet && !recentLevels.contains(charLevel)){
 				recentLevels.add(charLevel)
-				Some(CharLevel(char, Levels(now.toString, onlineLevel.last)))
+				Some(CharLevel(char, Levels(now.toString, onlineLevel.level)))
 			}
 			//if (char.characters.character.level < recentOnline[char])
 
