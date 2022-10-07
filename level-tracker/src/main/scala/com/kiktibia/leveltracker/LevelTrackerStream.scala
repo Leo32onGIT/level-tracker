@@ -59,15 +59,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
 
-			val levels = recentOnline.map(i => CharKey(i.char, Levels(i.level.time, i.level.level))).level.level
+			val levels: List[CharKey] = recentOnline.map(i => CharKey(i.char, Levels(i.level.time, i.level.level))).toList
 			//val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
 			// recentLevels.filterInPlace(i => !levels.contains(i.char))
-
-			val charSheet = char.characters.character.level
-			val charLevel = CharKey(char.characters.character.name, Levels(now.toString, levels))
-			if (levels > charSheet && !recentLevels.contains(charLevel)){
-				recentLevels.add(charLevel)
-				Some(CharLevel(char, Levels(now.toString, levels)))
+			levels.flatmap {l =>
+				val charSheet = char.characters.character.level
+				val charLevel = CharKey(char.characters.character.name, Levels(now.toString, l.level.level))
+				if (l.level.level > charSheet && !recentLevels.contains(charLevel)){
+					recentLevels.add(charLevel)
+					Some(CharLevel(char, Levels(now.toString, levels.last.level.level)))
+				}
+				else None
 			}
 			//if (char.characters.character.level < recentOnline[char])
 
