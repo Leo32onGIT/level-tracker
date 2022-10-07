@@ -21,9 +21,9 @@ import scala.jdk.CollectionConverters._
 class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
-  case class CharKey(char: String, level: Levels)
+  case class CharKey(char: String, level: Double)
 
-  case class CharLevel(char: CharacterResponse, level: Levels)
+  case class CharLevel(char: CharacterResponse, level: Double)
 
   private val recentLevels = mutable.Set.empty[CharKey]
   private val recentOnline = mutable.Set.empty[CharKey]
@@ -47,10 +47,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
-    val now = ZonedDateTime.now()
-    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, Levels(now.toString, i.level)))
+    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level))
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
-    recentOnline.addAll(online.map(i => CharKey(i.char, Levels(now.toString, i.level.level)))) // ...and add them again, with an updated online time
+    recentOnline.addAll(online.map(i => CharKey(i.char, i.level))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
@@ -58,15 +57,14 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
 			val sheetLevel = char.characters.character.level
-			val now = ZonedDateTime.parse(char.characters.character.last_login.get)
 			val name = char.characters.character.name
-			val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level.level)).toList
+			val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level)).toList
 			onlineLevel.flatMap { case (olName, olLevel) =>
 				if (olName == name){
-					val charLevel = CharKey(name, Levels(now.toString, olLevel))
+					val charLevel = CharKey(name, olLevel)
 					if (olLevel > sheetLevel && !recentLevels.contains(charLevel)){
 						recentLevels.add(charLevel)
-						Some(CharLevel(char, Levels(now.toString, olLevel)))
+						Some(CharLevel(char, olLevel))
 					}
 					else None
 				}
