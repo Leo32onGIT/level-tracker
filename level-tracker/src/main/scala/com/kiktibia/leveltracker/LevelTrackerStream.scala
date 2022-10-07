@@ -212,11 +212,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private def cleanUp(): Unit = {
     val now = ZonedDateTime.now()
     recentOnline.filterInPlace { i =>
-      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin), now).getSeconds
+      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < onlineRecentDuration
     }
     recentLevels.filterInPlace { i =>
-      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin), now).getSeconds
+      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < levelRecentDuration
     }
   }
