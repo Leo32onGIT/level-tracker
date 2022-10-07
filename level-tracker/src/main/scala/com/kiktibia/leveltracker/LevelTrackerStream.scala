@@ -58,10 +58,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val newLevels = characterResponses.flatMap { char =>
 			val sheetLevel = char.characters.character.level
 			val name = char.characters.character.name
-			val onlineLevel: List[CharKey] = recentOnline.map(i => (i.char, i.level, i.lastLogin)).toList
+			val onlineLevel: List[(String, Double, Option[String])] = recentOnline.map(i => (i.char, i.level, i.lastLogin)).toList
 			onlineLevel.flatMap { case (olName, olLevel, olLastLogin) =>
 				if (olName == name){
-					val charLevel = CharKey(name, olLevel, char.characters.character.last_login.get)
+					val charLevel = CharKey(name, olLevel, char.characters.character.last_login)
 					if (olLevel > sheetLevel && ZonedDateTime.parse(olLastLogin).toSeconds < ZonedDateTime.parse(char.characters.character.last_login.get).toSeconds && !recentLevels.contains(charLevel)) {
 						recentLevels.add(charLevel)
 						Some(CharLevel(char, olLevel))
