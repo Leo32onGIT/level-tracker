@@ -58,14 +58,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
-      val levels: List[Levels] = List(Levels(char.characters.character.last_login.getOrElse(""), char.characters.character.level.toInt))
-      levels.flatMap { level =>
-        val charLevel = CharKey(char.characters.character.name, Levels(now.toString, level.level.toInt + 1))
-        if (recentOnline.contains(charLevel)) {
+			val levels: List[CharKey] = Charkey(char.characters.character.name, Levels(now.toString, char.characters.character.level))
+      levels.flatMap { l =>
+        logger.info(l.toString)
+				logger.info(recentOnline.toString)
+				/***
+        if (levelData.level.level < recentLevels.contains) {
           recentLevels.add(charLevel)
 					Some(CharLevel(char, charLevel.level))
         }
         else None
+				***/
       }
     }
     Future.successful(newLevels)
@@ -108,13 +111,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
-          embedColor = 13773097 // bright red
+          embedColor = 36941 // bright green
           guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
         if (huntedGuilds == true){
-          embedColor = 36941 // bright green
+					embedColor = 13773097 // bright red
 					/***
           if (charLevel.level.level.toInt >= 250) {
             notablePoke = Config.inqBlessRole // PVE fullbless opportuniy (only poke for level 250+)
