@@ -63,7 +63,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 			//val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
 			//val countMap = (lev)
 			println(s"$char")
-			Some(None)
+			Some(CharLevel(char, Levels(now.toString, char.characters.character.level)))
 			/***foreach { l =>
 				if (l.level.level < recentOnline.)
 			}
