@@ -135,7 +135,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     ***/
 
     // var notablePoke = ""
-    val embeds = charLevels.toList.sortBy(_.level.time).map { charLevel =>
+    val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl("hunter")
