@@ -58,9 +58,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
 		val now = ZonedDateTime.now()
     val newLevels = characterResponses.flatMap { char =>
-			char.characters.foreach { c =>
-				logger.info(c.name)
-			}
 			val levels: List[CharKey] = List(Charkey(char.characters.character.name, Levels(now.toString, char.characters.character.level)))
       levels.flatMap { l =>
         logger.info(l.toString)
