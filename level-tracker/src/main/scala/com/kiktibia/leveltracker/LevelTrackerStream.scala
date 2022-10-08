@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
 class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
-  case class CharKey(char: String, level: Double)
+  case class CharKey(char: String, level: Double, lastLogin: ZonedDateTime)
 
   case class CharLevel(char: CharacterResponse, level: Double)
 
@@ -47,9 +47,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
-    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level))
+    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level, None))
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
-    recentOnline.addAll(online.map(i => CharKey(i.char, i.level))) // ...and add them again, with an updated online time
+    recentOnline.addAll(online.map(i => CharKey(i.char, i.level, None))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
@@ -57,16 +57,21 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
       val sheetLevel = char.characters.character.level
+      val sheetLogin = ZonedDateTime.parse(char.characters.character.last_login.get)
       val name = char.characters.character.name
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-          val charLevel = CharKey(name, olLevel)
+          val charLevel = CharKey(name, olLevel, sheetLogin)
 
+          // remove older levels
           for (l <- recentLevels
             if l.char == name && l.level < olLevel ){
-							println(l)
-              recentLevels.remove(l);
+              // need to use last_login here i think
+              if (sheetLogin.isAfter(l.lastLogin)){
+                println(l)
+                recentLevels.remove(l);
+              }
           }
 
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
