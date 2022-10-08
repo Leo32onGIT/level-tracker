@@ -57,7 +57,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
       val sheetLevel = char.characters.character.level
-      val sheetLogin = ZonedDateTime.parse(char.characters.character.last_login.get)
+      val sheetLogin = char.characters.character.last_login.get
       val name = char.characters.character.name
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
@@ -69,7 +69,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             if l.char == name && l.level < olLevel ){
               // need to use last_login here i think
               val charLogin = l.lastLogin.get
-              if (charLogin && sheetLogin.isAfter(ZonedDateTime.parse(charLogin))){
+              if (charLogin && ZonedDateTime.parse(sheetLogin).isAfter(ZonedDateTime.parse(charLogin))){
                 println(l)
                 recentLevels.remove(l);
               }
