@@ -68,8 +68,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           for (l <- recentLevels
             if l.char == name && l.level < olLevel ){
               // need to use last_login here i think
-              val charLogin = l.lastLogin.get
-              if (charLogin && ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")).isAfter(ZonedDateTime.parse(charLogin))){
+              val charLogin = l.lastLogin.getOrElse("2022-01-01T01:00:00Z")
+              if (charLogin != "2022-01-01T01:00:00Z" && ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")).isAfter(ZonedDateTime.parse(charLogin))){
                 println(l)
                 recentLevels.remove(l);
               }
