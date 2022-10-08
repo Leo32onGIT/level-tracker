@@ -63,6 +63,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
 
+					/***
           // "2022-01-01T01:00:00Z"
           // remove older levels
           for (l <- recentLevels
@@ -76,10 +77,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               if (olLevel > l.level && ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
                 //println(recentLogin)
                 //println(currentLogin)
-								println("TRIGGERED")
-                recentLevels -= l
-              };
-          }
+								//println("TRIGGERED")
+                //recentLevels -= l
+              }
+          };
+					***/
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
