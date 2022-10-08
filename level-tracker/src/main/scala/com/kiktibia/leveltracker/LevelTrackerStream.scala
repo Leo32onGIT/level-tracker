@@ -72,7 +72,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               println(l)
               // need to use last_login here i think
               val recentLogin = l.lastLogin.getOrElse("2022-01-01T01:00:00Z")
-              val currentLogin = sheetLogin.get
+              val currentLogin = sheetLogin.getOrElse("2022-01-01T01:00:00Z")
               if (olLevel < l.level && ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
                 //println(recentLogin)
                 //println(currentLogin)
