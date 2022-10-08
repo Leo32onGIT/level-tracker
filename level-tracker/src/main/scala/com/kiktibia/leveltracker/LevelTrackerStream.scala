@@ -62,26 +62,25 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i.char, i.level)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-          val charLevel = CharKey(olName, olLevel, sheetLogin)
 
           // "2022-01-01T01:00:00Z"
           // remove older levels
           for (l <- recentLevels
             //if l.char == name && l.level < olLevel ){
-            if l.char == olName){
+            if olName == l.char){
               println("recentLevels:")
               println(l)
               // need to use last_login here i think
-              val recentLogin = l.lastLogin.getOrElse("")
-              val currentLogin = sheetLogin.getOrElse("")
-              if (recentLogin != "" && currentLogin != ""){
-                if (ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
-                  //
-                  recentLevels.remove(l);
-                }
+              val recentLogin = l.lastLogin.get
+              val currentLogin = sheetLogin.get
+              if (ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
+                println(recentLogin)
+                println(currentLogin)
+                recentLevels.remove(l);
               }
           }
 
+          val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
