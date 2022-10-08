@@ -64,12 +64,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 					val charLevel = CharKey(name, olLevel)
 					if (olLevel <= sheetLevel && recentLevels.contains(charLevel)){
 						recentLevels.filterInPlace(i => !onlineLevel.contains(charLevel)) // cleanup attempt
-						logger.info("REMOVAL TRIGGERED")
 					}
 					if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
 						recentLevels.add(charLevel)
 						Some(CharLevel(char, olLevel))
-						logger.info("SOMEONE LEVELED")
 					}
 					else None
 				}
