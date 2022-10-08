@@ -166,6 +166,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   // Remove players from the list who haven't logged in for a while. Remove old saved deaths.
   private def cleanUp(): Unit = {
+    /***
     val now = ZonedDateTime.now()
     recentOnline.filterInPlace { i =>
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
@@ -175,6 +176,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < levelRecentDuration
     }
+    ***/
   }
 
   private def vocEmoji(char: CharacterResponse): String = {
