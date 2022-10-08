@@ -64,7 +64,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           val charLevel = CharKey(name, olLevel)
 
           for (l <- recentLevels
-            if l.level < olLevel ){
+            if l.char == name && l.level < olLevel ){
 							println(l)
               recentLevels.remove(l);
           }
