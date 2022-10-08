@@ -62,6 +62,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 			onlineLevel.flatMap { case (olName, olLevel, olLastLogin) =>
 				if (olName == name){
 					val charLevel = CharKey(name, olLevel, char.characters.character.last_login)
+					if (olLevel == sheetLevel && recentLevels.contains(olName)){
+						recentLevels.filterInPlace(i => !onlineLevel.contains(olName)) // cleanup attempt
+					}
 					if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
 						recentLevels.add(charLevel)
 						Some(CharLevel(char, olLevel))
@@ -70,71 +73,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 				}
 				else None
 			}
-			//val levels: List[CharKey] = char.map(i => CharKey(i.name, Levels(now.toString, i.level)))
-			// recentLevels.filterInPlace(i => !levels.contains(i.char))
-			/***
-			levels.flatMap {l =>
-				val charSheet = char.characters.character.level
-				val charLevel = CharKey(char.characters.character.name, Levels(now.toString, l.level.level))
-				if (l.level.level > charSheet && !recentLevels.contains(charLevel)){
-					recentLevels.add(charLevel)
-					Some(CharLevel(char, Levels(now.toString, l.level.level)))
-				}
-				else None
-			}
-			***/
-			//if (char.characters.character.level < recentOnline[char])
-
-			/***foreach { l =>
-				if (l.level.level < recentOnline.)
-			}
-
-			deaths.flatMap { death =>
-        val deathTime = ZonedDateTime.parse(death.time)
-        val deathAge = java.time.Duration.between(deathTime, now).getSeconds
-        val charDeath = CharKey(char.characters.character.name, deathTime)
-			}
-
-        if (deathAge < deathRecentDuration && !recentDeaths.contains(charDeath)) {
-          recentDeaths.add(charDeath)
-          Some(CharDeath(char, death))
-        }
-        else None
-
-			val levels: List[CharKey] = List(Charkey(char.characters.character.name, Levels(now.toString, char.characters.character.level)))
-      levels.flatMap { l =>
-        logger.info(l.toString)
-
-
-        if (levelData.level.level < recentLevels.contains) {
-          recentLevels.add(charLevel)
-					Some(CharLevel(char, charLevel.level))
-        }
-        else None
-				***/
     }
     Future.successful(newLevels)
   }.withAttributes(logAndResume)
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharLevel]].mapAsync(1) { charLevels =>
 
-    /***
-    // Filter only the interesting deaths (nemesis bosses, rare bestiary)
-    val (notableDeaths, normalDeaths) = charDeaths.toList.partition { charDeath =>
-      Config.notableCreatures.exists(c => c.endsWith(charDeath.death.killers.last.name.toLowerCase))
-    }
-
-    // logging
-    logger.info(s"New notable deaths: ${notableDeaths.length}")
-    notableDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
-    logger.info(s"New normal deaths: ${normalDeaths.length}")
-    normalDeaths.foreach(d => logger.info(s"${d.char.characters.character.name} - ${d.death.killers.last.name}"))
-
-
-    val embeds = notableDeaths.sortBy(_.death.time).map { charDeath =>
-    ***/
-
-    // var notablePoke = ""
     val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
