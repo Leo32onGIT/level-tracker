@@ -66,11 +66,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
           // remove older levels
           for (l <- recentLevels
+            println("recentLevels:")
+            println(l)
             if l.char == name && l.level < olLevel ){
               // need to use last_login here i think
               val charLogin = l.lastLogin.getOrElse("2022-01-01T01:00:00Z")
               if (charLogin != "2022-01-01T01:00:00Z" && ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")).isAfter(ZonedDateTime.parse(charLogin))){
-                println(l)
+                //
                 recentLevels.remove(l);
               }
           }
@@ -98,7 +100,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = ":x: **No Guild**\n"
+      var guildText = ""
 
       // guild
       // does player have guild?
@@ -163,7 +165,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   // Remove players from the list who haven't logged in for a while. Remove old saved deaths.
   private def cleanUp(): Unit = {
-    /***
     val now = ZonedDateTime.now()
     recentOnline.filterInPlace { i =>
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
@@ -173,7 +174,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < levelRecentDuration
     }
-    ***/
   }
 
   private def vocEmoji(char: CharacterResponse): String = {
