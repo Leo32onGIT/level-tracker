@@ -62,9 +62,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 			onlineLevel.flatMap { case (olName, olLevel) =>
 				if (olName == name){
 					val charLevel = CharKey(name, olLevel)
-					if (olLevel <= sheetLevel && recentLevels.contains(charLevel)){
-						recentLevels.filterInPlace(i => !onlineLevel.contains(charLevel)) // cleanup attempt
-					}
 					if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
 						recentLevels.add(charLevel)
 						Some(CharLevel(char, olLevel))
@@ -163,7 +160,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < levelRecentDuration
     }
-		*///
+		***/
   }
 
   private def vocEmoji(char: CharacterResponse): String = {
