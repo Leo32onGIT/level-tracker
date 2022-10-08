@@ -21,7 +21,7 @@ import scala.jdk.CollectionConverters._
 class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
-  case class CharKey(char: String, level: Double, lastLogin: ZonedDateTime)
+  case class CharKey(char: String, level: Double, lastLogin: Option[String])
 
   case class CharLevel(char: CharacterResponse, level: Double)
 
@@ -68,7 +68,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           for (l <- recentLevels
             if l.char == name && l.level < olLevel ){
               // need to use last_login here i think
-              if (sheetLogin.isAfter(l.lastLogin)){
+              val charLogin = l.lastLogin.get
+              if (charLogin && sheetLogin.isAfter(ZonedDateTime.parse(charLogin))){
                 println(l)
                 recentLevels.remove(l);
               }
