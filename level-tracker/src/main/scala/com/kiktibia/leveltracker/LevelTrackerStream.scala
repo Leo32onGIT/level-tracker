@@ -26,7 +26,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   case class CharLevel(char: CharacterResponse, level: Double)
 
   private val recentLevels = mutable.Set.empty[CharKey]
-  private val recentOnline = mutable.Set.empty[CharKey]
+  private val recentOnline = mutable.Set.empty[(String, Double)]
 
   private val tibiaDataClient = new TibiaDataClient()
 
@@ -47,9 +47,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }.withAttributes(logAndResume)
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
-    val online: List[CharKey] = worldResponse.worlds.world.online_players.map(i => CharKey(i.name, i.level, None))
+    val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level)).toList
     recentOnline.filterInPlace(i => !online.contains(i.char)) // Remove existing online chars from the list...
-    recentOnline.addAll(online.map(i => CharKey(i.char, i.level, None))) // ...and add them again, with an updated online time
+    recentOnline.addAll(online.map(i => (i.char, i.level)).toList) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_.char).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
