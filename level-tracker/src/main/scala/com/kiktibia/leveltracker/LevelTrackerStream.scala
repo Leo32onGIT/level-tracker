@@ -67,7 +67,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           // remove older levels
           for (l <- recentLevels
             //if l.char == name && l.level < olLevel ){
-            if l.char == name){
+            if l.char == name && l.level < olLevel ){
               println("recentLevels:")
               println(l)
               // need to use last_login here i think
