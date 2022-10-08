@@ -76,6 +76,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               if (olLevel > l.level && ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
                 //println(recentLogin)
                 //println(currentLogin)
+								println("TRIGGERED")
                 recentLevels -= l
               };
           }
