@@ -63,6 +63,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
 
+					for (l <- recentLevels
+            //if l.char == name && l.level < olLevel ){
+            if olName == l.char){
+              println("recentLevels:")
+              println(l)
+          };
+
 					/***
           // "2022-01-01T01:00:00Z"
           // remove older levels
