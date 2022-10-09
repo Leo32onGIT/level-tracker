@@ -64,18 +64,25 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
 
-
+          // attempt to cleanup recentLevels
           for (l <- recentLevels
-            //if l.char == name && l.level < olLevel ){
+            // online char matches recentLevels entry
             if olName == l.char){
               //println(l)
-              val lastLoginCheck = l.lastLogin.getOrElse("")
+              val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
+                // if player didn't relog
+                // recentLevel.level entry is greater than online level
+                // charactersheet last_login matches recentLevel
                 if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                   println(s"Died and stayed logged in:")
                   println(l)
+                  println(lastLoginCheck)
+                  println(sheetLogin.getOrElse("2022-01-01T01:00:00Z"))
                   recentLevels.remove(l);
                 }
+                // recentLevel.level entry is greater than online level
+                // charactersheet last_login greater than recentLevel.lastLogin entry
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Died and relogged:")
                   println(l)
@@ -104,7 +111,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           };
           ***/
 
-          val charLevel = CharKey(olName, olLevel, sheetLogin)
+          val charLevel = CharKey(olName, olLevel, sheetLogin.getOrElse(Some("2022-01-01T01:00:00Z")))
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
