@@ -111,7 +111,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           };
           ***/
 
-          val charLevel = CharKey(olName, olLevel, sheetLogin.getOrElse(Some("2022-01-01T01:00:00Z")))
+          val charLevel = CharKey(olName, olLevel, sheetLogin.getOrElse("2022-01-01T01:00:00Z"))
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
