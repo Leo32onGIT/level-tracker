@@ -64,14 +64,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
 
-          /***
+
           for (l <- recentLevels
             //if l.char == name && l.level < olLevel ){
             if olName == l.char){
               println("recentLevels:")
               println(l)
           };
-          ***/
 
           /***
           // "2022-01-01T01:00:00Z"
@@ -191,6 +190,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     ***/
     // private val recentLevels = mutable.Set.empty[CharKey]
     // case class CharKey(char: String, level: Double, lastLogin: Option[String])
+
     val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
     recentLevels.filterInPlace( i => !onlineLevel.contains(i.char) )
 
