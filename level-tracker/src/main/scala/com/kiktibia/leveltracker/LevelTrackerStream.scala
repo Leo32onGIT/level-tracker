@@ -69,7 +69,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             //if l.char == name && l.level < olLevel ){
             if olName == l.char){
               //println(l)
-              val lastLoginCheck = l.lastLogin.getorElse("")
+              val lastLoginCheck = l.lastLogin.getOrElse("")
               if (lastLoginCheck != ""){
                 if (l.level > olLevel || ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Level entry deleted:")
