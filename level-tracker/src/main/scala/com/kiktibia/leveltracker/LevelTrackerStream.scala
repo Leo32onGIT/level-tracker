@@ -70,7 +70,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             if olName == l.char){
               println("recentLevels:")
               //println(l)
-              if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.isBefore(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+              if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin).isBefore(sheetLogin.getOrElse("2022-01-01T01:00:00Z"))) {
                 println(l)
                 print(s" ${l.level} $olLevel")
                 recentLevels.remove(l);
