@@ -63,12 +63,14 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
 
+          /***
           for (l <- recentLevels
             //if l.char == name && l.level < olLevel ){
             if olName == l.char){
               println("recentLevels:")
               println(l)
           };
+          ***/
 
           /***
           // "2022-01-01T01:00:00Z"
@@ -185,11 +187,25 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < onlineRecentDuration
     }
-    recentLevels.filterInPlace { i =>
-      val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
-      diff < levelRecentDuration
-    }
     ***/
+    // private val recentLevels = mutable.Set.empty[CharKey]
+    // case class CharKey(char: String, level: Double, lastLogin: Option[String])
+    recentLevels.filterInPlace { i =>
+      val name = i.char
+      val level = i.level
+      var check = false
+      //val lastLogin = i.lastLogin.getOrElse("2022-01-01T01:00:00Z")
+      val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
+      onlineLevel.flatMap { case (olName, olLevel) =>
+        if (olName == name){
+          if (level > olLevel){
+            //!online.contains(i._1)
+            check = true
+          }
+        }
+      }
+      check
+    }
   }
 
   private def vocEmoji(char: CharacterResponse): String = {
