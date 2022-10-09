@@ -190,7 +190,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     ***/
     // private val recentLevels = mutable.Set.empty[CharKey]
     // case class CharKey(char: String, level: Double, lastLogin: Option[String])
-    recentLevels.filterInPlace { i =>
+    recentLevels.filterInPlace{ i =>
       val name = i.char
       val level = i.level
       var check = false
@@ -201,10 +201,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           if (level > olLevel){
             //!online.contains(i._1)
             check = true
+            check
           }
         }
       }
-      check
     }
   }
 
