@@ -195,15 +195,16 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val level = i.level
       val lastLogin = i.lastLogin.getOrElse("2022-01-01T01:00:00Z")
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
-      val check = onlineLevel.flatMap { case (olName, olLevel) =>
+      onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
           if (level > olLevel){
             //!online.contains(i._1)
             Some(olName, level, lastLogin)
           }
+          else None
         }
-      }.getOrElse(false)
-      check
+        else None
+      }
     }
   }
 
