@@ -199,11 +199,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         if (olName == name){
           if (level > olLevel){
             //!online.contains(i._1)
-            Some(olName, level, lastLogin)
+            true
           }
-          else None
+          else false
         }
-        else None
+        else false
       }
     }
   }
