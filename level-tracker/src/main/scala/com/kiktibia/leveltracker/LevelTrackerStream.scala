@@ -63,7 +63,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-
+          var test = olLevel
           // attempt to cleanup recentLevels
           for (l <- recentLevels
             // online char matches recentLevels entry
@@ -79,6 +79,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                   println(s"Died and stayed logged in:")
                   println(l)
                   print(olLevel) // olLevel is old value? sheetvalue? wth
+                  test = l.level
                   recentLevels.remove(l)
                 }
                 // recentLevel.level entry is greater than online level
@@ -110,9 +111,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               }
           };
           ***/
-
-          val charLevel = CharKey(olName, olLevel, sheetLogin)
-          if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
+          val charLevel = CharKey(olName, test, sheetLogin)
+          if (olLevel > sheetLevel && !recentLevels.contains(charLevel) && ) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
           }
