@@ -74,12 +74,14 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 // if player didn't relog
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login matches recentLevel
+                /***
                 if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                   println(s"Died and stayed logged in:")
                   println(l)
-                  print(olLevel)
+                  print(olLevel) // olLevel is old value? sheetvalue? wth
                   recentLevels.remove(l);
                 }
+                ***/
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login greater than recentLevel.lastLogin entry
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
