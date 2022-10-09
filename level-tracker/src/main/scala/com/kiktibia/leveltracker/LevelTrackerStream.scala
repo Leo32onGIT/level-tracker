@@ -48,7 +48,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
-    //val filtered = arrayTuple.filter(t => numbers.contains(t._1))
+    //
     recentOnline.filterInPlace(i => !online.contains(i._1)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
@@ -201,8 +201,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   // Remove players from the list who haven't logged in for a while. Remove old saved deaths.
   private def cleanUp(): Unit = {
-    /***
+
     val now = ZonedDateTime.now()
+    if (now.getHour == 8 && now.getMinute < 5){ // server save
+      recentOnline.clear()
+      recentLevels.clear()
+    }
+    /***
     recentOnline.filterInPlace { i =>
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
       diff < onlineRecentDuration
