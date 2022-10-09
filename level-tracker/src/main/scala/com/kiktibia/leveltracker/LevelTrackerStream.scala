@@ -57,7 +57,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
-      var check = true
       val sheetLevel = char.characters.character.level
       val sheetLogin = char.characters.character.last_login
       val name = char.characters.character.name
@@ -78,7 +77,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                   println(s"Died and stayed logged in:")
                   println(l)
-                  check = false
+                  print(olLevel)
                   recentLevels.remove(l);
                 }
                 // recentLevel.level entry is greater than online level
@@ -112,7 +111,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           ***/
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
-          if (olLevel > sheetLevel && !recentLevels.contains(charLevel) && check == true) {
+          if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
           }
