@@ -68,7 +68,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             if olName == l.char){
               println("recentLevels:")
               println(l)
-              }
           };
 
           /***
