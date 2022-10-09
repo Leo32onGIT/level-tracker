@@ -205,7 +205,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         }
         else None
       }
-      if (Some(check)){
+      if (check){
         true
       }
       else false
