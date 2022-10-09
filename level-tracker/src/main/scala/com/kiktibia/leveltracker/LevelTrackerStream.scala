@@ -70,7 +70,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             if olName == l.char){
               println("recentLevels:")
               println(l)
-          };
+              if (l.level > olLevel){
+                recentLevels.remove(l);
+              }
+          }
 
           /***
           // "2022-01-01T01:00:00Z"
