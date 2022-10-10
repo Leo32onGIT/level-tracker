@@ -72,6 +72,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
         // attempt to cleanup recentLevels
         for (l <- recentLevels){
+
+          // DEBUG:
+          println(s"\t${l._1}, ${l._2.toInt}, ${l._3.getOrElse("Invalid")}");
+
           // online char matches recentLevels entry
           if (olName == l.char){
             val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
@@ -83,6 +87,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               // charactersheet last_login matches recentLevel
 
               // current issue
+              /***
               if (l.level > olLevel && lastLoginCheck == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                 //debug
                 println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
@@ -90,11 +95,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 //println(l)
                 recentLevels.remove(l)
               }
+              ***/
 
               // delete recentLevel entry if player relogs
               if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                 //debug
-                println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
+                println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
                 println(s"Relogged.")
                 //println(l)
                 recentLevels.remove(l)
@@ -122,14 +128,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
     val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
-      var embedColor = 3092790 // background default
-      var embedThumbnail = creatureImageUrl("hunter")
 
       // guild rank and name
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = ""
+      var guildText = s"${vocEmoji(charLevel.char)}"
 
       // guild
       // does player have guild?
@@ -138,51 +142,54 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
-          embedColor = 36941 // bright green
+          //embedColor = 36941 // bright green
           guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
         if (huntedGuilds == true){
-          embedColor = 13773097 // bright red
+          //embedColor = 13773097 // bright red
           /***
           if (charLevel.level.level.toInt >= 250) {
             notablePoke = Config.inqBlessRole // PVE fullbless opportuniy (only poke for level 250+)
           }
           ***/
         }
-        guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+        guildText = s"$guildIcon"
       }
 
       // player
       // ally player
       val allyPlayers = Config.allyPlayers.contains(charName.toLowerCase())
       if (allyPlayers == true){
-        embedColor = 36941 // bright green
+        //embedColor = 36941 // bright green
       }
       // hunted player
       val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
       if (huntedPlayers == true){
-        embedColor = 13773097 // bright red bright green
+        //embedColor = 13773097 // bright red bright green
       }
 
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText Advanced to level **${charLevel.level.toInt}**."
-
+      val levelMessage = s"${vocEmoji(charLevel.char)} [$charName](${charUrl(charName)}) $guildText advanced to level **${charLevel.level.toInt}**."
+      /***
       val embed = new EmbedBuilder()
       embed.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
       embed.setDescription(embedText)
       // embed.setThumbnail(embedThumbnail)
       embed.setColor(embedColor)
       embed.build()
+      ***/
+      levelsChannel.sendMessage(levelMessage).queue()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
+    /***
     embeds.foreach { embed =>
       levelsChannel.sendMessageEmbeds(embed).queue()
     }
-    /***
+
     if (notablePoke != ""){
       deathsChannel.sendMessage(notablePoke).queue();
     }
