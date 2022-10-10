@@ -79,19 +79,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 if (l.level > olLevel && lastLoginCheck == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                   //debug
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
-                  println(s"Died and stayed logged in:")
-                  println(l)
+                  println(s"Died and stayed logged in.")
+                  //println(l)
                   recentLevels.remove(l)
                 }
 
-                // notes:
-                // recentLevel.level entry is greater than online level
-                // charactersheet last_login greater than recentLevel.lastLogin entry
+                // delete recentLevel entry if player relogs
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   //debug
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
-                  println(s"Relogged:")
-                  println(l)
+                  println(s"Relogged.")
+                  //println(l)
                   recentLevels.remove(l)
                 }
               }
