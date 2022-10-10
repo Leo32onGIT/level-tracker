@@ -48,8 +48,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
-    //
-    recentOnline.filterInPlace(i => !online.contains(i._1)) // Remove existing online chars from the list...
+    recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated online time
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
@@ -74,14 +73,11 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 // if player didn't relog
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login matches recentLevel
-                /***
                 if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
                   println(s"Died and stayed logged in:")
                   println(l)
-                  print(olLevel) // olLevel is old value? sheetvalue? wth
                   recentLevels.remove(l)
                 }
-                ***/
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login greater than recentLevel.lastLogin entry
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
