@@ -68,7 +68,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             // online char matches recentLevels entry
             if olName == l.char){
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
-              println(s"Online /w Level Entry:\n$olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
 
               if (lastLoginCheck != ""){
 
@@ -78,6 +77,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
                 // current issue
                 if (l.level > olLevel && lastLoginCheck == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
+                  //debug
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
                   println(s"Died and stayed logged in:")
                   println(l)
                   recentLevels.remove(l)
@@ -87,6 +88,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login greater than recentLevel.lastLogin entry
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                  //debug
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("NO DATA")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("NO DATA")}")
                   println(s"Relogged:")
                   println(l)
                   recentLevels.remove(l)
