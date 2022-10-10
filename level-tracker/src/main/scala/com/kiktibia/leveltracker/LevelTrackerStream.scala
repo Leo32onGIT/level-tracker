@@ -73,9 +73,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         // attempt to cleanup recentLevels
         for (l <- recentLevels){
 
-          // DEBUG:
-          println(s"\t${l._1}, ${l._2.toInt}, ${l._3.getOrElse("Invalid")}");
-
           // online char matches recentLevels entry
           if (olName == l.char){
             val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
