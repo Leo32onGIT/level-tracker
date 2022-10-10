@@ -70,7 +70,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         for (l <- recentLevels){
           // online char matches recentLevels entry
           if (olName == l.char){
-            val lastLoginCheck = l.lastLogin.getOrElse(""); // safety?
+            val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
 
             if (lastLoginCheck != ""){
 
@@ -95,7 +95,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 //println(l)
                 recentLevels.remove(l)
               }
-            };
+            }
+          };
         }
 
         // !online.map(_._1).contains(i._1)
