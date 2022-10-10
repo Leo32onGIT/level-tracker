@@ -54,7 +54,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     // DEBUG:
     println("recentOnline (String, Double):")
     for (l <- recentOnline){
-      println(s"${l._1}, ${l._2}");
+      println(s"\t${l._1}\t${l._2.toInt}");
     }
 
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
@@ -194,11 +194,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   // Remove players from the list who haven't logged in for a while. Remove old saved deaths.
   private def cleanUp(): Unit = {
 
-    val now = ZonedDateTime.now()
-    if (now.getHour == 8 && now.getMinute < 5){ // server save
-      recentOnline.clear()
-      recentLevels.clear()
-    }
     /***
     recentOnline.filterInPlace { i =>
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
