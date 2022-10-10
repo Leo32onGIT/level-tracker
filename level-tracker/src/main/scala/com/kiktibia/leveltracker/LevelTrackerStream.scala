@@ -49,13 +49,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
     //recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
-    recentOnline.filterInPlace(i => false)
+    recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
 
     // DEBUG:
     println("recentOnline (String, Double):")
     for (l <- recentOnline){
-      println(s"\t${l._1}\t${l._2.toInt}");
+      println(s"\t${l._1}, ${l._2.toInt}");
     }
 
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
