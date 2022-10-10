@@ -50,10 +50,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
     recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
-    for (l <- recentOnline
-      println("recentOnline:")
-      println(l)
-    );
+    for (l <- recentOnline){
+      println("recentOnline:");
+      println(l);
+    }
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
@@ -67,10 +67,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       onlineLevel.flatMap { case (olName, olLevel) =>
 
         // attempt to cleanup recentLevels
-        for (l <- recentLevels
+        for (l <- recentLevels){
           // online char matches recentLevels entry
-          if olName == l.char){
-            val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
+          if (olName == l.char){
+            val lastLoginCheck = l.lastLogin.getOrElse(""); // safety?
 
             if (lastLoginCheck != ""){
 
@@ -95,8 +95,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 //println(l)
                 recentLevels.remove(l)
               }
-            }
-        };
+            };
+        }
 
         // !online.map(_._1).contains(i._1)
         // !recentLevels.map{ x => (x._1, x._2) }.contains((olName, olLevel))
