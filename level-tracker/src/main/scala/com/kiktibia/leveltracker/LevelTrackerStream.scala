@@ -67,7 +67,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           for (l <- recentLevels
             // online char matches recentLevels entry
             if olName == l.char){
-              println(s"Online /w Level Entry: $olName, $olLevel, ${sheetLogin.getOrElse("2022-01-01T01:00:00Z")}\nRecent Level: ${l.char}, ${l.char}, ${l.lastLogin}")
+              println(s"Online /w Level Entry: $olName, $olLevel, ${sheetLogin.get}\nRecent Level: ${l.char}, ${l.char}, ${l.lastLogin.get}")
 
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
