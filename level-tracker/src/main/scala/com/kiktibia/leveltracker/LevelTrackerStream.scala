@@ -104,7 +104,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         // _.name).contains(charLevel.name)
 
         val charLevel = CharKey(olName, olLevel, sheetLogin)
-        if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
+        if (olName == name && olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
           recentLevels.add(charLevel)
           Some(CharLevel(char, olLevel))
         }
