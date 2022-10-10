@@ -109,9 +109,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
               }
           };
           ***/
-
+					// !online.map(_._1).contains(i._1)
+					// !recentLevels.map{ x => (x._1, x._2) }.contains((olName, olLevel))
+					// _.name).contains(charLevel.name)
           val charLevel = CharKey(olName, olLevel, sheetLogin)
-          if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
+          //if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
+					if (olLevel > sheetLevel && !recentLevels.map{ x => (x._1, x._2) }.contains((olName, olLevel))) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
           }
