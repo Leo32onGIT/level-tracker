@@ -213,8 +213,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
     if (embeds.nonEmpty) {
       // DEBUG:
-      embeds.sortWith(_._2 > _._2)
-      levelsChannel.sendMessageEmbeds(embeds._1.asJava).queue()
+      val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
+      levelsChannel.sendMessageEmbeds(embedData.asJava).queue()
       //println(embeds)
       //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
     }
