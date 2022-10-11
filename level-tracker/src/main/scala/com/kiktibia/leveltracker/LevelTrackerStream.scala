@@ -23,7 +23,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   // A date-based "key" for a character, used to track recent deaths and recent online entries
   case class CharKey(char: String, level: Double, lastLogin: Option[String])
 
-  case class CharLevel(char: CharacterResponse, level: Double, notification: Int)
+  case class CharLevel(char: CharacterResponse, level: Double)
 
   private val recentLevels = mutable.Set.empty[CharKey]
   private val recentOnline = mutable.Set.empty[(String, Double)]
@@ -125,7 +125,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             val guildName = if(!(guild.isEmpty)) guild.head.name else ""
             if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
               recentLevels.add(charLevel)
-              Some(CharLevel(char, olLevel, 0))
+              Some(CharLevel(char, olLevel))
             }
             else None
           }
@@ -213,8 +213,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
     if (embeds.nonEmpty) {
       // DEBUG:
-      embeds.sortBy(_(2)).map{ embedData =>
-        levelsChannel.sendMessageEmbeds(_(1).asJava).queue()
+      embeds.sortBy(2).map{ embedData =>
+        levelsChannel.sendMessageEmbeds(embedData(1).asJava).queue()
       }
       println(embeds)
       //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
