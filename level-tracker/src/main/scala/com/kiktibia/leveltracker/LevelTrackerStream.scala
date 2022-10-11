@@ -53,10 +53,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
 
     // DEBUG:
+    /***
     println("recentOnline (String, Double):")
     for (l <- recentOnline){
       println(s"\t${l._1}, ${l._2.toInt}");
     }
+    ***/
 
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
