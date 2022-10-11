@@ -195,15 +195,16 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
       // DEBUG:
-      charLevel.notification = if (embedColor == 36941) 1 else if (embedColor == 13773097) 2 else 0
+      val notification = if (embedColor == 36941) 1 else if (embedColor == 13773097) 2 else 0
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
-      new EmbedBuilder()
+      ((new EmbedBuilder()
       //.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
       .setDescription(embedText)
       // embed.setThumbnail(embedThumbnail)
       .setColor(embedColor)
       .build()
+      ), (notification))
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     //embeds.foreach { embed =>
@@ -211,10 +212,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     //}
 
     if (embeds.nonEmpty) {
-      val embedSort = embeds.sortBy(_.notification)
       // DEBUG:
+      embeds.sortBy(embeds._2).map{ embedData =>
+        levelsChannel.sendMessageEmbeds(embeds._1.asJava).queue()
+      }
       println(embeds)
-      levelsChannel.sendMessageEmbeds(embedSort.asJava).queue()
+      //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
     }
 
     cleanUp()
