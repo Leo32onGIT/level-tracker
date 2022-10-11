@@ -148,17 +148,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      //var guildText = ""
+      var guildText = ""
 
       // guild
       // does player have guild?
-      //var guildIcon = Config.otherGuild
+      var guildIcon = Config.otherGuild
       if (guildName != "") {
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 36941 // bright green
-          //guildIcon = Config.allyGuild
+          guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
@@ -171,6 +171,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           ***/
         }
         //guildText = s"\n$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
+        guildText = s"""||[$guildIcon](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})||"""
       }
 
       // player
@@ -188,7 +189,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**."
+      val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**. $guildText"
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
       new EmbedBuilder()
