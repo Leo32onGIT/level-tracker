@@ -49,7 +49,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
     recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
+    //recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
+
+    // DEBUG:
+    /***
+    println("recentOnline (String, Double):")
+    for (l <- recentOnline){
+      println(s"\t${l._1}, ${l._2.toInt}");
+    }
+    ***/
+
     val charsToCheck: Set[String] = recentOnline.map(_._1).toSet
     Source(charsToCheck).mapAsyncUnordered(24)(tibiaDataClient.getCharacter).runWith(Sink.collection).map(_.toSet)
   }.withAttributes(logAndResume)
@@ -83,6 +93,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login greater than recentLevel.lastLogin entry
                 if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
                   println(s"Relogged:")
                   println(l)
                   recentLevels.remove(l)
@@ -112,8 +123,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
-            recentLevels.add(charLevel)
-            Some(CharLevel(char, olLevel))
+            val guild = char.characters.character.guild
+            val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+            if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
+              recentLevels.add(charLevel)
+              Some(CharLevel(char, olLevel))
+            }
+            else None
           }
           else None
         }
@@ -125,7 +141,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharLevel]].mapAsync(1) { charLevels =>
 
-    val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
+    //val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
+    // sort in reverse
+    var embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl("hunter")
@@ -134,17 +152,19 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = ""
+      //var guildText = ""
 
       // guild
       // does player have guild?
-      var guildIcon = Config.otherGuild
       if (guildName != "") {
+        //var guildIcon = Config.otherGuild
         // is player an ally
+        embedColor = 4540237
+
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 36941 // bright green
-          guildIcon = Config.allyGuild
+          //guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
@@ -156,7 +176,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           }
           ***/
         }
-        guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})\n"
+        //guildText = s"\n$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
+
+        //guildText = guildIcon
       }
 
       // player
@@ -174,24 +196,33 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText Advanced to level **${charLevel.level.toInt}**."
+      val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
-      val embed = new EmbedBuilder()
-      embed.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
-      embed.setDescription(embedText)
+      // DEBUG:
+      val notification = if (embedColor == 4540237) 1 else if (embedColor == 13773097) 2 else if (embedColor == 36941) 3 else 0
+
+      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
+      ((new EmbedBuilder()
+      //.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
+      .setDescription(embedText)
       // embed.setThumbnail(embedThumbnail)
-      embed.setColor(embedColor)
-      embed.build()
+      .setColor(embedColor)
+      .build()
+      ), (notification))
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
-    embeds.foreach { embed =>
-      levelsChannel.sendMessageEmbeds(embed).queue()
+    //embeds.foreach { embed =>
+      //levelsChannel.sendMessageEmbeds(embed).queue()
+    //}
+
+    if (embeds.nonEmpty) {
+      // DEBUG:
+      val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
+      levelsChannel.sendMessageEmbeds(embedData.asJava).queue()
+      //println(embeds)
+      //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
     }
-    /***
-    if (notablePoke != ""){
-      deathsChannel.sendMessage(notablePoke).queue();
-    }
-    ***/
+
     cleanUp()
 
     Future.successful()
@@ -200,11 +231,6 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   // Remove players from the list who haven't logged in for a while. Remove old saved deaths.
   private def cleanUp(): Unit = {
 
-    val now = ZonedDateTime.now()
-    if (now.getHour == 8 && now.getMinute < 5){ // server save
-      recentOnline.clear()
-      recentLevels.clear()
-    }
     /***
     recentOnline.filterInPlace { i =>
       val diff = java.time.Duration.between(ZonedDateTime.parse(i.lastLogin.get), now).getSeconds
@@ -213,10 +239,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     ***/
     // private val recentLevels = mutable.Set.empty[CharKey]
     // case class CharKey(char: String, level: Double, lastLogin: Option[String])
-/***
+      /***
     val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
     recentLevels.filterInPlace( i => !onlineLevel.contains(i.char) )
-***/
+    ***/
     /***
     recentLevels.filterInPlace{ i =>
       val name = i.char
