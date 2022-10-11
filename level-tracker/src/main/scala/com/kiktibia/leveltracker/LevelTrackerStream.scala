@@ -148,7 +148,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = ""
+      var guildText = vocEmoji(charLevel.char)
 
       // guild
       // does player have guild?
@@ -171,7 +171,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           ***/
         }
         //guildText = s"$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
-        guildText = s"[$guildIcon](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")}) | "
+        guildText = s"[$guildIcon](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
       }
 
       // player
@@ -189,7 +189,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**."
+      val embedText = s"$guildText **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**."
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
       new EmbedBuilder()
