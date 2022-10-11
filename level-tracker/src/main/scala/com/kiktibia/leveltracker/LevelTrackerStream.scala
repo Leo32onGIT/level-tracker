@@ -39,7 +39,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   }
   private val logAndResume: Attributes = supervisionStrategy(logAndResumeDecider)
 
-  private lazy val sourceTick = Source.tick(2.seconds, 30.seconds, ()) // im kinda cow-boying it here
+  private lazy val sourceTick = Source.tick(2.seconds, 60.seconds, ()) // im kinda cow-boying it here
 
   private lazy val getWorld = Flow[Unit].mapAsync(1) { _ =>
     logger.info("Running stream")
