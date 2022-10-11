@@ -123,13 +123,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
-            val guild = char.characters.character.guild
-            val guildName = if(!(guild.isEmpty)) guild.head.name else ""
-            if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
+            //val guild = char.characters.character.guild
+            //val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+            //if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
               recentLevels.add(charLevel)
               Some(CharLevel(char, olLevel))
-            }
-            else None
+            //}
+            //else None
           }
           else None
         }
