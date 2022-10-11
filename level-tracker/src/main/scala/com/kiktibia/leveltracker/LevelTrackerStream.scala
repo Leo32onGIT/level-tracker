@@ -157,6 +157,8 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       if (guildName != "") {
         //var guildIcon = Config.otherGuild
         // is player an ally
+        embedColor = 4540237
+
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 36941 // bright green
@@ -195,7 +197,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
       // DEBUG:
-      val notification = if (embedColor == 36941) 1 else if (embedColor == 13773097) 2 else 0
+      val notification = if (embedColor == 4540237) 1 else if (embedColor == 13773097) 2 else if (embedColor == 36941) 3 else 0
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
       ((new EmbedBuilder()
