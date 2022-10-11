@@ -23,7 +23,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
   // A date-based "key" for a character, used to track recent deaths and recent online entries
   case class CharKey(char: String, level: Double, lastLogin: Option[String])
 
-  case class CharLevel(char: CharacterResponse, level: Double)
+  case class CharLevel(char: CharacterResponse, level: Double, notification: Int)
 
   private val recentLevels = mutable.Set.empty[CharKey]
   private val recentOnline = mutable.Set.empty[(String, Double)]
@@ -125,7 +125,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
             val guildName = if(!(guild.isEmpty)) guild.head.name else ""
             if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
               recentLevels.add(charLevel)
-              Some(CharLevel(char, olLevel))
+              Some(CharLevel(char, olLevel, 0))
             }
             else None
           }
@@ -139,7 +139,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharLevel]].mapAsync(1) { charLevels =>
 
-    val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
+    //val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
+    // sort in reverse
+    var embeds = charLevels.toList.sortBy(- _.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
       var embedThumbnail = creatureImageUrl("hunter")
@@ -192,6 +194,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       // this is the actual embed description
       val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
+      // DEBUG:
+      charLevel.notification = if (embedColor == 36941) 1 else if (embedColor == 13773097) 2 else 0
+
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
       new EmbedBuilder()
       //.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
@@ -206,7 +211,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     //}
 
     if (embeds.nonEmpty) {
-      levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
+      val embedSort = embeds.sortBy(_.notification)
+      // DEBUG:
+      println(embeds)
+      levelsChannel.sendMessageEmbeds(embedSort.asJava).queue()
     }
 
     cleanUp()
