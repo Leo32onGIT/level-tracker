@@ -239,10 +239,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     ***/
     // private val recentLevels = mutable.Set.empty[CharKey]
     // case class CharKey(char: String, level: Double, lastLogin: Option[String])
-/***
+      /***
     val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
     recentLevels.filterInPlace( i => !onlineLevel.contains(i.char) )
-***/
+    ***/
     /***
     recentLevels.filterInPlace{ i =>
       val name = i.char
