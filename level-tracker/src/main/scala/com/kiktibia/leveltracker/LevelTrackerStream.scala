@@ -121,8 +121,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
-            recentLevels.add(charLevel)
-            Some(CharLevel(char, olLevel))
+            val guild = char.characters.character.guild
+            val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+            if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
+              recentLevels.add(charLevel)
+              Some(CharLevel(char, olLevel))
+            }
+            else None
           }
           else None
         }
@@ -185,15 +190,13 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       // this is the actual embed description
       val embedText = s"$guildText Advanced to level **${charLevel.level.toInt}**."
 
-      if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
-        new EmbedBuilder()
-        .setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
-        .setDescription(embedText)
-        // embed.setThumbnail(embedThumbnail)
-        .setColor(embedColor)
-        .build()
-      }
-			else None
+      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
+      new EmbedBuilder()
+      .setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
+      .setDescription(embedText)
+      // embed.setThumbnail(embedThumbnail)
+      .setColor(embedColor)
+      .build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
