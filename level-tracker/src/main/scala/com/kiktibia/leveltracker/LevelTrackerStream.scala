@@ -185,14 +185,15 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       // this is the actual embed description
       val embedText = s"$guildText Advanced to level **${charLevel.level.toInt}**."
 
-      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
-        val embed = new EmbedBuilder()
-        embed.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
-        embed.setDescription(embedText)
+      if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
+        new EmbedBuilder()
+        .setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
+        .setDescription(embedText)
         // embed.setThumbnail(embedThumbnail)
-        embed.setColor(embedColor)
-        embed.build()
-      //}
+        .setColor(embedColor)
+        .build()
+      }
+			else None
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
     embeds.foreach { embed =>
