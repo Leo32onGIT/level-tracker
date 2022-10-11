@@ -148,17 +148,17 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       val guild = charLevel.char.characters.character.guild
       val guildName = if(!(guild.isEmpty)) guild.head.name else ""
       val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
-      var guildText = "<:indent:1025915320285798451>"
+      //var guildText = ""
 
       // guild
       // does player have guild?
       if (guildName != "") {
-				var guildIcon = Config.otherGuild
+        //var guildIcon = Config.otherGuild
         // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 36941 // bright green
-          guildIcon = Config.allyGuild
+          //guildIcon = Config.allyGuild
         }
         // is player in hunted guild
         val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
@@ -172,7 +172,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
         }
         //guildText = s"\n$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
 
-				guildText = guildIcon
+        //guildText = guildIcon
       }
 
       // player
@@ -190,7 +190,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       //val epochSecond = ZonedDateTime.parse(charDeath.death.time).toEpochSecond
 
       // this is the actual embed description
-      val embedText = s"$guildText ${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
+      val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
       new EmbedBuilder()
@@ -201,14 +201,14 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       .build()
     }
     // Send the embeds one at a time, otherwise some don't get sent if sending a lot at once
-    embeds.foreach { embed =>
-      levelsChannel.sendMessageEmbeds(embed).queue()
+    //embeds.foreach { embed =>
+      //levelsChannel.sendMessageEmbeds(embed).queue()
+    //}
+
+    if (embeds.nonEmpty) {
+      levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
     }
-    /***
-    if (notablePoke != ""){
-      deathsChannel.sendMessage(notablePoke).queue();
-    }
-    ***/
+
     cleanUp()
 
     Future.successful()
