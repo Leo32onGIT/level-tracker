@@ -93,16 +93,10 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 // recentLevel.level entry is greater than online level
                 // charactersheet last_login greater than recentLevel.lastLogin entry
                 //if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
-                if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                if (olLevel < l.level || ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                  println(s"Relogged")
+                  println(s"Relogged or died, removing level entry.")
                   recentLevels.remove(l)
-                }
-                if (olLevel < l.level) {
-                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                  println(s"Died")
-                  recentLevels.remove(l)
-                }
               }
           };
 
