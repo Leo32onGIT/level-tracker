@@ -221,6 +221,12 @@ class LevelTrackerStream(allyChannel: TextChannel, enemyChannel: TextChannel, ne
 
       // filter by notification type (embed color)
       //val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
+      var allLevels = embeds.map(_._1)
+      while (allLevels.nonEmpty){
+        levelsChannel.sendMessageEmbeds(allLevels.take(10).asJava).queue();
+        allLevels = allLevels.drop(10);
+      }
+
       var allyLevels = embeds.filter(_._2 == 3).map(_._1)
       while (allyLevels.nonEmpty){
         allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue();

@@ -9,9 +9,10 @@ object Config {
 
   val token: String = root.getString("token")
   val guildId: String = root.getString("guild-id")
+  val levelsChannelId: String = root.getString("levels-channel-id")
   val allyChannelId: String = root.getString("ally-channel-id")
-	val enemyChannelId: String = root.getString("enemy-channel-id")
-	val neutralChannelId: String = root.getString("neutral-channel-id")
+  val enemyChannelId: String = root.getString("enemy-channel-id")
+  val neutralChannelId: String = root.getString("neutral-channel-id")
   val creatureUrlMappings: Map[String, String] = root.getObject("creature-url-mappings").asScala.map {
     case (k, v) => k -> v.unwrapped().toString
   }.toMap
