@@ -23,7 +23,7 @@ class TibiaDataClient extends JsonSupport with StrictLogging {
   def getWorld(): Future[WorldResponse] = {
 
     for {
-      response <- Http().singleRequest(HttpRequest(uri = s"$worldUrl$obfsName"))
+      response <- Http().singleRequest(HttpRequest(uri = worldUrl))
       decoded = decodeResponse(response)
       unmarshalled <- Unmarshal(decoded).to[WorldResponse]
     } yield unmarshalled
