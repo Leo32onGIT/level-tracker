@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.jdk.CollectionConverters._
 
-class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
+class LevelTrackerStream(allyChannel: TextChannel, enemyChannel: TextChannel, neutralChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
   case class CharKey(char: String, level: Double, lastLogin: Option[String])
@@ -127,7 +127,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             //val guild = char.characters.character.guild
             //val guildName = if(!(guild.isEmpty)) guild.head.name else ""
-            //if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
+            //if (olLevel > 250 || Config.enemyGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.enemyPlayers.contains(name.toLowerCase())) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
             //}
@@ -168,9 +168,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           embedColor = 36941 // bright green
           //guildIcon = Config.allyGuild
         }
-        // is player in hunted guild
-        val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
-        if (huntedGuilds == true){
+        // is player in enemy guild
+        val enemyGuilds = Config.enemyGuilds.contains(guildName.toLowerCase())
+        if (enemyGuilds == true){
           embedColor = 13773097 // bright red
           /***
           if (charLevel.level.level.toInt >= 250) {
@@ -189,9 +189,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       if (allyPlayers == true){
         embedColor = 36941 // bright green
       }
-      // hunted player
-      val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
-      if (huntedPlayers == true){
+      // enemy player
+      val enemyPlayers = Config.enemyPlayers.contains(charName.toLowerCase())
+      if (enemyPlayers == true){
         embedColor = 13773097 // bright red bright green
       }
 
@@ -203,7 +203,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       // DEBUG:
       val notification = if (embedColor == 4540237) 1 else if (embedColor == 13773097) 2 else if (embedColor == 36941) 3 else 0
 
-      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
+      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show enemy/ally or neutrals over level 250
       ((new EmbedBuilder()
       //.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
       .setDescription(embedText)
@@ -218,13 +218,27 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     //}
 
     if (embeds.nonEmpty) {
-      // DEBUG:
-      val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
-      var embedBatch = embedData
-      while (embedBatch.nonEmpty){
-        levelsChannel.sendMessageEmbeds(embedBatch.take(10).asJava).queue();
-        embedBatch = embedBatch.drop(10);
+
+      // filter by notification type (embed color)
+      //val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
+      var allyLevels = embeds.filter(_._2 == 3).map(_._1)
+      while (allyLevels.nonEmpty){
+        allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue();
+        allyLevels = allyLevels.drop(10);
       }
+
+      var enemyLevels = embeds.filter(_._2 == 2).map(_._1)
+      while (enemyLevels.nonEmpty){
+        enemyChannel.sendMessageEmbeds(enemyLevels.take(10).asJava).queue();
+        enemyLevels = enemyLevels.drop(10);
+      }
+
+      var neutralLevels = embeds.filter(_._2 <= 1).map(_._1)
+      while (neutralLevels.nonEmpty){
+        neutralChannel.sendMessageEmbeds(neutralLevels.take(10).asJava).queue();
+        neutralLevels = neutralLevels.drop(10);
+      }
+
     }
 
     cleanUp()
