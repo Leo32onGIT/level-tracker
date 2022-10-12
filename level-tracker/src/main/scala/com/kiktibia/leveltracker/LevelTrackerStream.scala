@@ -222,7 +222,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       var embedBatch = embedData
       while (embedBatch.nonEmpty){
         levelsChannel.sendMessageEmbeds(embedBatch.take(10).asJava).queue();
-        embedBatch.drop(10);
+        embedBatch = embedBatch.drop(10);
       }
     }
 
