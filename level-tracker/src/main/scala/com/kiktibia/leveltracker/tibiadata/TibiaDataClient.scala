@@ -17,16 +17,29 @@ class TibiaDataClient extends JsonSupport with StrictLogging {
   implicit private val system: ActorSystem = ActorSystem()
   implicit private val executionContext: ExecutionContextExecutor = system.dispatcher
 
-  private val worldUrl = "https://api.tibiadata.com/v3/world/Seanera"
+  private val worldUrl = "https://api.tibiadata.com/v3/world/"
   private val characterUrl = "https://api.tibiadata.com/v3/character/"
 
   def getWorld(): Future[WorldResponse] = {
+
+    // yeehaw
+    var obfsName = ""
+    val rand = scala.util.Random
+    "Seanera".toLowerCase.foreach { letter =>
+      if (letter.isLetter && rand.nextBoolean() == true) {
+        obfsName += s"${letter.toUpper}"
+      } else {
+        obfsName += s"$letter"
+      }
+    }
+
     for {
-      response <- Http().singleRequest(HttpRequest(uri = worldUrl))
+      response <- Http().singleRequest(HttpRequest(uri = s"$worldUrl$obfsName"))
       decoded = decodeResponse(response)
       unmarshalled <- Unmarshal(decoded).to[WorldResponse]
     } yield unmarshalled
   }
+
 
   def getCharacter(name: String): Future[CharacterResponse] = {
 
