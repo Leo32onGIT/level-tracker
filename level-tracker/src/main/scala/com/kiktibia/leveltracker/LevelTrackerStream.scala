@@ -219,7 +219,15 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     if (embeds.nonEmpty) {
       // DEBUG:
       val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
-      levelsChannel.sendMessageEmbeds(embedData.asJava).queue()
+      if (embeds.length <= 10) {
+        levelsChannel.sendMessageEmbeds(embedData.asJava).queue()
+      } else {
+        var embedDelay = embedData
+        while (embedDelay.notEmpty){
+            levelsChannel.sendMessageEmbeds(embedDelay.take(10).asJava).queue();
+            embedDelay.drop(10);
+        }
+      }
       //println(embeds)
       //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
     }
