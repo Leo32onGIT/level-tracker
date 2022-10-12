@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.jdk.CollectionConverters._
 
-class LevelTrackerStream(allyChannel: TextChannel, enemyChannel: TextChannel, neutralChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
+class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, enemyChannel: TextChannel, neutralChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
   case class CharKey(char: String, level: Double, lastLogin: Option[String])
