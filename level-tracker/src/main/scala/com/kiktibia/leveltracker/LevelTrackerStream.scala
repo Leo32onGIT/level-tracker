@@ -95,8 +95,12 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
                 //if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                 if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                  println(s"Relogged:")
-                  println(l)
+                  println(s"Relogged")
+                  recentLevels.remove(l)
+                }
+                if (olLevel < l.level) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
+                  println(s"Died")
                   recentLevels.remove(l)
                 }
               }
