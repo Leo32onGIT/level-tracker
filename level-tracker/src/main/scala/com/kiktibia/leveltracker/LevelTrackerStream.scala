@@ -97,7 +97,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
             if (olName == l.char){
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
-                if (olLevel < l.level && ZonedDateTime.parse(olStamp).isAfter(ZonedDateTime.parse(l.timestamp))) {
+                if (olLevel < l.level && ZonedDateTime.parse(olTimeStamp).isAfter(ZonedDateTime.parse(l.timestamp))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
                   println(s"Died, removing level entry.")
                   recentLevels.remove(l)
