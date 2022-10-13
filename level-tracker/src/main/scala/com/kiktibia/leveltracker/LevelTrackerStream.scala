@@ -21,12 +21,12 @@ import scala.jdk.CollectionConverters._
 class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, enemyChannel: TextChannel, neutralChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
-  case class CharKey(char: String, level: Double, lastLogin: Option[String], timestamp: String)
+  case class CharKey(char: String, level: Double, lastLogin: Option[String])
 
   case class CharLevel(char: CharacterResponse, level: Double)
 
   private val recentLevels = mutable.Set.empty[CharKey]
-  private val recentOnline = mutable.Set.empty[(String, Double, String)]
+  private val recentOnline = mutable.Set.empty[(String, Double)]
 
   private val tibiaDataClient = new TibiaDataClient()
 
@@ -47,12 +47,11 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
   }.withAttributes(logAndResume)
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
-    val timeStamp = worldResponse.information.timestamp
-    val online: List[(String, Double, String)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level, timeStamp))
+    val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
     //val timeStamp = worldResponse.information.timestamp // online_players record date
     //recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
     recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
-    recentOnline.addAll(online.map(i => (i._1, i._2, i._3))) // ...and add them again, with an updated level
+    recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
 
     // DEBUG:
     /***
@@ -72,46 +71,43 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       val sheetLevel = char.characters.character.level
       val sheetLogin = char.characters.character.last_login
       val name = char.characters.character.name
-      val onlineLevel: List[(String, Double, String)] = recentOnline.map(i => (i._1, i._2, i._3)).toList
-      onlineLevel.flatMap { case (olName, olLevel, olStamp) =>
+      val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
+      onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-
           // attempt to cleanup recentLevels
           for (l <- recentLevels){
+
             // recent online character relogged
             if (olName == l.char){
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
-
-                // remove recent level entry if char relogs
                 if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
                   println(s"Relogged, removing level entry.")
                   recentLevels.remove(l)
                 }
-
               }
             };
 
-            //WIP
+            //// DEBUG: oLevel from worldResponse.worlds.world.online_players -> sometimes returns previous level due to cache
+            // recent online character died after leveling
+            /***
             if (olName == l.char){
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
-                if (olLevel < l.level && ZonedDateTime.parse(olTimeStamp).isAfter(ZonedDateTime.parse(l.timestamp))) {
+                if ( ) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                  println(s"Died, removing level entry.")
+                  println(s"Relogged, removing level entry.")
                   recentLevels.remove(l)
                 }
               }
             };
+            ***/
 
           }
 
-          // WIP
-          val charLevel = CharKey(olName, olLevel, sheetLogin, olStamp)
-          val recentLevelsNoStamp = recentLevels --= timestamp
-          val levelNoStamp = (olName, olLevel, sheetLogin).toList
-          if (olLevel > sheetLevel && !recentLevelsNoStamp.contains(levelNoStamp)) {
+          val charLevel = CharKey(olName, olLevel, sheetLogin)
+          if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             //if (olLevel > 250 || Config.enemyGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.enemyPlayers.contains(name.toLowerCase())) {
             recentLevels.add(charLevel)
             Some(CharLevel(char, olLevel))
