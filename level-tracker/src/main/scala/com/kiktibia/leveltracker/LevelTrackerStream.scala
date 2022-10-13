@@ -82,7 +82,6 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
             //}
             //else None
           }
-          else None
 
           // attempt to cleanup recentLevels
           for (l <- recentLevels){
