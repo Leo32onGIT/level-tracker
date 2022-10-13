@@ -84,7 +84,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       }
 
       // attempt to cleanup recentLevels
-      val recentOnline = onlineLevel.flatMap { case (oldName, oldLevel) =>
+      val recentOnlineCheck = onlineLevel.flatMap { case (oldName, oldLevel) =>
         for (l <- recentLevels){
           // online char matches recentLevels entry
           if (oldName == l.char){
