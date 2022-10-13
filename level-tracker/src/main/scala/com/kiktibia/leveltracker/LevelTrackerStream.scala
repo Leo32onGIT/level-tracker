@@ -72,27 +72,6 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-
-          /***
-          // "2022-01-01T01:00:00Z"
-          // remove older levels
-          for (l <- recentLevels
-            //if l.char == name && l.level < olLevel ){
-            if olName == l.char){
-              println("recentLevels:")
-              println(l)
-              // need to use last_login here i think
-              val recentLogin = l.lastLogin.getOrElse("2022-01-01T01:00:00Z")
-              val currentLogin = sheetLogin.getOrElse("2022-01-01T01:00:00Z")
-              if (olLevel > l.level && ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
-                //println(recentLogin)
-                //println(currentLogin)
-                //println("TRIGGERED")
-                //recentLevels -= l
-              }
-          };
-          ***/
-
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             //val guild = char.characters.character.guild
@@ -103,24 +82,24 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
             //}
             //else None
           }
-          else None
-        }
-        else None
-      }
 
-      // attempt to cleanup recentLevels
-      for (l <- recentLevels){
-        // online char matches recentLevels entry
-        if (olName == l.char){
-          val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
-          if (lastLoginCheck != ""){
-            if (olLevel < l.level || ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
-              println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-              println(s"Relogged or died, removing level entry.")
-              recentLevels.remove(l)
+          // attempt to cleanup recentLevels
+          for (l <- recentLevels){
+            // online char matches recentLevels entry
+            if (olName == l.char){
+              val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
+              if (lastLoginCheck != ""){
+                if (olLevel < l.level || ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
+                  println(s"Relogged or died, removing level entry.")
+                  recentLevels.remove(l)
+                }
+              }
             }
           }
-        };
+
+        }
+        else None
       }
 
     }
