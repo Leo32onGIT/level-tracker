@@ -22,7 +22,10 @@ object BotApp extends App with StrictLogging {
   private val guild: Guild = jda.getGuildById(Config.guildId)
 
   private val levelsChannel = guild.getTextChannelById(Config.levelsChannelId)
-  private val levelTrackerStream = new LevelTrackerStream(levelsChannel)
+  private val allyChannel = guild.getTextChannelById(Config.allyChannelId)
+  private val enemyChannel = guild.getTextChannelById(Config.enemyChannelId)
+  private val neutralChannel = guild.getTextChannelById(Config.neutralChannelId)
+  private val levelTrackerStream = new LevelTrackerStream(levelsChannel, allyChannel, enemyChannel, neutralChannel)
 
   levelTrackerStream.stream.run()
 }
