@@ -109,7 +109,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
 
           // WIP
           val charLevel = CharKey(olName, olLevel, sheetLogin, olStamp)
-          val recentLevelsNoStamp = recentLevels -- _._4
+          val recentLevelsNoStamp = recentLevels -- recentLevels._4
           val levelNoStamp = (olName, olLevel, sheetLogin).toList
           if (olLevel > sheetLevel && !recentLevelsNoStamp.contains(levelNoStamp)) {
             //if (olLevel > 250 || Config.enemyGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.enemyPlayers.contains(name.toLowerCase())) {
