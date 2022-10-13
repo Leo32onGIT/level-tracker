@@ -48,6 +48,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
+    //val timeStamp = worldResponse.information.timestamp // online_players record date
     //recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
     recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
@@ -66,33 +67,20 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
 
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
+      // characters page info
       val sheetLevel = char.characters.character.level
       val sheetLogin = char.characters.character.last_login
       val name = char.characters.character.name
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-
           // attempt to cleanup recentLevels
           for (l <- recentLevels){
-            // online char matches recentLevels entry
+
+            // recent online character relogged
             if (olName == l.char){
-              //println(l)
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
-                // if player didn't relog
-                // recentLevel.level entry is greater than online level
-                // charactersheet last_login matches recentLevel
-                /***
-                if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
-                  println(s"Died and stayed logged in:")
-                  println(l)
-                  recentLevels.remove(l)
-                }
-                ***/
-                // recentLevel.level entry is greater than online level
-                // charactersheet last_login greater than recentLevel.lastLogin entry
-                //if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                 if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
                   println(s"Relogged, removing level entry.")
@@ -100,6 +88,22 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
                 }
               }
             };
+
+            //// DEBUG: oLevel from worldResponse.worlds.world.online_players -> sometimes returns previous level due to cache
+            // recent online character died after leveling
+            /***
+            if (olName == l.char){
+              val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
+              if (lastLoginCheck != ""){
+                if ( ) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
+                  println(s"Relogged, removing level entry.")
+                  recentLevels.remove(l)
+                }
+              }
+            };
+            ***/
+
           }
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
