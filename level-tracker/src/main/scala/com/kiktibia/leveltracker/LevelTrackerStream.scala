@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.jdk.CollectionConverters._
 
-class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
+class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, enemyChannel: TextChannel, neutralChannel: TextChannel)(implicit ex: ExecutionContextExecutor, mat: Materializer) extends StrictLogging {
 
   // A date-based "key" for a character, used to track recent deaths and recent online entries
   case class CharKey(char: String, level: Double, lastLogin: Option[String])
@@ -48,8 +48,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val getCharacterData = Flow[WorldResponse].mapAsync(1) { worldResponse =>
     val online: List[(String, Double)] = worldResponse.worlds.world.online_players.map(i => (i.name, i.level))
-    recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
-    //recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
+    //val timeStamp = worldResponse.information.timestamp // online_players record date
+    //recentOnline.filterInPlace(i => !online.map(_._1).contains(i._1)) // Remove existing online chars from the list...
+    recentOnline.filterInPlace(i => false) // idk what im doing, clearing the recentOnline list completely i guess
     recentOnline.addAll(online.map(i => (i._1, i._2))) // ...and add them again, with an updated level
 
     // DEBUG:
@@ -66,76 +67,57 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
 
   private lazy val scanForLevels = Flow[Set[CharacterResponse]].mapAsync(1) { characterResponses =>
     val newLevels = characterResponses.flatMap { char =>
+      // characters page info
       val sheetLevel = char.characters.character.level
       val sheetLogin = char.characters.character.last_login
       val name = char.characters.character.name
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
-
           // attempt to cleanup recentLevels
-          for (l <- recentLevels
-            // online char matches recentLevels entry
-            if olName == l.char){
-              //println(l)
+          for (l <- recentLevels){
+
+            // recent online character relogged
+            if (olName == l.char){
               val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
               if (lastLoginCheck != ""){
-                // if player didn't relog
-                // recentLevel.level entry is greater than online level
-                // charactersheet last_login matches recentLevel
-                /***
-                if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
-                  println(s"Died and stayed logged in:")
-                  println(l)
-                  recentLevels.remove(l)
-                }
-                ***/
-                // recentLevel.level entry is greater than online level
-                // charactersheet last_login greater than recentLevel.lastLogin entry
-                if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
                   println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                  println(s"Relogged:")
-                  println(l)
+                  println(s"Relogged, removing level entry.")
                   recentLevels.remove(l)
                 }
               }
-          };
+            };
 
-          /***
-          // "2022-01-01T01:00:00Z"
-          // remove older levels
-          for (l <- recentLevels
-            //if l.char == name && l.level < olLevel ){
-            if olName == l.char){
-              println("recentLevels:")
-              println(l)
-              // need to use last_login here i think
-              val recentLogin = l.lastLogin.getOrElse("2022-01-01T01:00:00Z")
-              val currentLogin = sheetLogin.getOrElse("2022-01-01T01:00:00Z")
-              if (olLevel > l.level && ZonedDateTime.parse(recentLogin).isBefore(ZonedDateTime.parse(currentLogin))) {
-                //println(recentLogin)
-                //println(currentLogin)
-                //println("TRIGGERED")
-                //recentLevels -= l
+            //// DEBUG: oLevel from worldResponse.worlds.world.online_players -> sometimes returns previous level due to cache
+            // recent online character died after leveling
+            /***
+            if (olName == l.char){
+              val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
+              if (lastLoginCheck != ""){
+                if ( ) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
+                  println(s"Relogged, removing level entry.")
+                  recentLevels.remove(l)
+                }
               }
-          };
-          ***/
+            };
+            ***/
+
+          }
 
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
-            //val guild = char.characters.character.guild
-            //val guildName = if(!(guild.isEmpty)) guild.head.name else ""
-            //if (olLevel > 250 || Config.huntedGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.huntedPlayers.contains(name.toLowerCase())) {
-              recentLevels.add(charLevel)
-              Some(CharLevel(char, olLevel))
-            //}
-            //else None
+            //if (olLevel > 250 || Config.enemyGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.enemyPlayers.contains(name.toLowerCase())) {
+            recentLevels.add(charLevel)
+            Some(CharLevel(char, olLevel))
           }
           else None
         }
         else None
       }
     }
+
     Future.successful(newLevels)
   }.withAttributes(logAndResume)
 
@@ -166,9 +148,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
           embedColor = 36941 // bright green
           //guildIcon = Config.allyGuild
         }
-        // is player in hunted guild
-        val huntedGuilds = Config.huntedGuilds.contains(guildName.toLowerCase())
-        if (huntedGuilds == true){
+        // is player in enemy guild
+        val enemyGuilds = Config.enemyGuilds.contains(guildName.toLowerCase())
+        if (enemyGuilds == true){
           embedColor = 13773097 // bright red
           /***
           if (charLevel.level.level.toInt >= 250) {
@@ -187,9 +169,9 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       if (allyPlayers == true){
         embedColor = 36941 // bright green
       }
-      // hunted player
-      val huntedPlayers = Config.huntedPlayers.contains(charName.toLowerCase())
-      if (huntedPlayers == true){
+      // enemy player
+      val enemyPlayers = Config.enemyPlayers.contains(charName.toLowerCase())
+      if (enemyPlayers == true){
         embedColor = 13773097 // bright red bright green
       }
 
@@ -201,7 +183,7 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
       // DEBUG:
       val notification = if (embedColor == 4540237) 1 else if (embedColor == 13773097) 2 else if (embedColor == 36941) 3 else 0
 
-      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show hunted/ally or neutrals over level 250
+      //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show enemy/ally or neutrals over level 250
       ((new EmbedBuilder()
       //.setTitle(s"${vocEmoji(charLevel.char)} $charName ${vocEmoji(charLevel.char)}", charUrl(charName))
       .setDescription(embedText)
@@ -216,11 +198,33 @@ class LevelTrackerStream(levelsChannel: TextChannel)(implicit ex: ExecutionConte
     //}
 
     if (embeds.nonEmpty) {
-      // DEBUG:
-      val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
-      levelsChannel.sendMessageEmbeds(embedData.asJava).queue()
-      //println(embeds)
-      //levelsChannel.sendMessageEmbeds(embeds.asJava).queue()
+
+      // filter by notification type (embed color)
+      //val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
+      var allLevels = embeds.map(_._1)
+      while (allLevels.nonEmpty){
+        levelsChannel.sendMessageEmbeds(allLevels.take(10).asJava).queue();
+        allLevels = allLevels.drop(10);
+      }
+
+      var allyLevels = embeds.filter(_._2 == 3).map(_._1)
+      while (allyLevels.nonEmpty){
+        allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue();
+        allyLevels = allyLevels.drop(10);
+      }
+
+      var enemyLevels = embeds.filter(_._2 == 2).map(_._1)
+      while (enemyLevels.nonEmpty){
+        enemyChannel.sendMessageEmbeds(enemyLevels.take(10).asJava).queue();
+        enemyLevels = enemyLevels.drop(10);
+      }
+
+      var neutralLevels = embeds.filter(_._2 <= 1).map(_._1)
+      while (neutralLevels.nonEmpty){
+        neutralChannel.sendMessageEmbeds(neutralLevels.take(10).asJava).queue();
+        neutralLevels = neutralLevels.drop(10);
+      }
+
     }
 
     cleanUp()
