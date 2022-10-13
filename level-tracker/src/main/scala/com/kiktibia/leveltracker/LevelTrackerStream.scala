@@ -98,6 +98,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
             }
           }
         }
+        None
       }
 
     }
