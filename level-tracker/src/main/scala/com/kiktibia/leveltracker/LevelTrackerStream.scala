@@ -89,7 +89,7 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
               }
             };
 
-            //// DEBUG: oLevel from worldResponse.worlds.world.online_players -> sometimes returns previous level due to cache
+            //// DEBUG: oLevel from worldResponse.worlds.world.online_players -> sometimes returns previous level due to cache?
             // recent online character died after leveling
             /***
             if (olName == l.char){
@@ -124,7 +124,6 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
   private lazy val postToDiscordAndCleanUp = Flow[Set[CharLevel]].mapAsync(1) { charLevels =>
 
     //val embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
-    // sort in reverse
     var embeds = charLevels.toList.sortBy(_.level).map { charLevel =>
       val charName = charLevel.char.characters.character.name
       var embedColor = 3092790 // background default
@@ -132,17 +131,17 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
 
       // guild rank and name
       val guild = charLevel.char.characters.character.guild
-      val guildName = if(!(guild.isEmpty)) guild.head.name else ""
-      val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
+      //val guildName = if(!(guild.isEmpty)) guild.head.name else ""
+      //val guildRank = if(!(guild.isEmpty)) guild.head.rank else ""
       //var guildText = ""
 
       // guild
       // does player have guild?
       if (guildName != "") {
         //var guildIcon = Config.otherGuild
-        // is player an ally
-        embedColor = 4540237
+        embedColor = 4540237 // light grey
 
+        // is player an ally
         val allyGuilds = Config.allyGuilds.contains(guildName.toLowerCase())
         if (allyGuilds == true){
           embedColor = 36941 // bright green
@@ -159,7 +158,6 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
           ***/
         }
         //guildText = s"\n$guildIcon *$guildRank* of the [$guildName](https://www.tibia.com/community/?subtopic=guilds&page=view&GuildName=${guildName.replace(" ", "%20")})"
-
         //guildText = guildIcon
       }
 
@@ -180,7 +178,8 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       // this is the actual embed description
       val embedText = s"${vocEmoji(charLevel.char)} **[$charName](${charUrl(charName)})** ${vocEmoji(charLevel.char)} advanced to level **${charLevel.level.toInt}**"
 
-      // DEBUG:
+      // tag embed
+      // 0 = neutral no guild, 1 = neutral guilded, 2 = enemy,3 = ally
       val notification = if (embedColor == 4540237) 1 else if (embedColor == 13773097) 2 else if (embedColor == 36941) 3 else 0
 
       //if (embedColor != 3092790 || charLevel.level.toInt > 250) { // only show enemy/ally or neutrals over level 250
@@ -199,29 +198,29 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
 
     if (embeds.nonEmpty) {
 
-      // filter by notification type (embed color)
+      // filter by notification tag
       //val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
       var allLevels = embeds.map(_._1)
       while (allLevels.nonEmpty){
-        levelsChannel.sendMessageEmbeds(allLevels.take(10).asJava).queue();
+        levelsChannel.sendMessageEmbeds(allLevels.take(10).asJava).queue(); // all embeds post here
         allLevels = allLevels.drop(10);
       }
 
       var allyLevels = embeds.filter(_._2 == 3).map(_._1)
       while (allyLevels.nonEmpty){
-        allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue();
+        allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue(); // ally embeds post here
         allyLevels = allyLevels.drop(10);
       }
 
       var enemyLevels = embeds.filter(_._2 == 2).map(_._1)
       while (enemyLevels.nonEmpty){
-        enemyChannel.sendMessageEmbeds(enemyLevels.take(10).asJava).queue();
+        enemyChannel.sendMessageEmbeds(enemyLevels.take(10).asJava).queue(); // enemy embed post here
         enemyLevels = enemyLevels.drop(10);
       }
 
       var neutralLevels = embeds.filter(_._2 <= 1).map(_._1)
       while (neutralLevels.nonEmpty){
-        neutralChannel.sendMessageEmbeds(neutralLevels.take(10).asJava).queue();
+        neutralChannel.sendMessageEmbeds(neutralLevels.take(10).asJava).queue(); // neutral guild or no guild post here
         neutralLevels = neutralLevels.drop(10);
       }
 
