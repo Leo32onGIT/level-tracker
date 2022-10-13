@@ -72,6 +72,36 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       val onlineLevel: List[(String, Double)] = recentOnline.map(i => (i._1, i._2)).toList
       onlineLevel.flatMap { case (olName, olLevel) =>
         if (olName == name){
+
+          // attempt to cleanup recentLevels
+          for (l <- recentLevels){
+            // online char matches recentLevels entry
+            if (olName == l.char){
+              //println(l)
+              val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
+              if (lastLoginCheck != ""){
+                // if player didn't relog
+                // recentLevel.level entry is greater than online level
+                // charactersheet last_login matches recentLevel
+                /***
+                if (l.level > olLevel && l.lastLogin.get == sheetLogin.getOrElse("2022-01-01T01:00:00Z")) {
+                  println(s"Died and stayed logged in:")
+                  println(l)
+                  recentLevels.remove(l)
+                }
+                ***/
+                // recentLevel.level entry is greater than online level
+                // charactersheet last_login greater than recentLevel.lastLogin entry
+                //if (l.level > olLevel && ZonedDateTime.parse(l.lastLogin.get).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                if (ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
+                  println(s"Online /w Level Entry:\n OL: $olName, $olLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
+                  println(s"Relogged, removing level entry.")
+                  recentLevels.remove(l)
+                }
+              }
+            };
+          }
+
           val charLevel = CharKey(olName, olLevel, sheetLogin)
           if (olLevel > sheetLevel && !recentLevels.contains(charLevel)) {
             //if (olLevel > 250 || Config.enemyGuilds.contains(guildName.toLowerCase()) || Config.allyGuilds.contains(guildName.toLowerCase()) || Config.allyPlayers.contains(name.toLowerCase()) || Config.enemyPlayers.contains(name.toLowerCase())) {
@@ -82,25 +112,6 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
         }
         else None
       }
-
-      // attempt to cleanup recentLevels
-      val recentOnlineCheck = onlineLevel.flatMap { case (oldName, oldLevel) =>
-        for (l <- recentLevels){
-          // online char matches recentLevels entry
-          if (oldName == l.char){
-            val lastLoginCheck = l.lastLogin.getOrElse("") // safety?
-            if (lastLoginCheck != ""){
-              if (oldLevel < l.level || ZonedDateTime.parse(l.lastLogin.getOrElse("2022-01-01T01:00:00Z")).isBefore(ZonedDateTime.parse(sheetLogin.getOrElse("2022-01-01T01:00:00Z")))) {
-                println(s"Online /w Level Entry:\n OL: $oldName, $oldLevel, ${sheetLogin.getOrElse("Invalid")}\n RL: ${l.char}, ${l.level}, ${l.lastLogin.getOrElse("Invalid")}")
-                println(s"Relogged or died, removing level entry.")
-                recentLevels.remove(l)
-              }
-            }
-          }
-        };
-        None
-      }
-
     }
 
     Future.successful(newLevels)
