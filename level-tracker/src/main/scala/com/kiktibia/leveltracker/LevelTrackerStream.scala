@@ -202,28 +202,50 @@ class LevelTrackerStream(levelsChannel: TextChannel, allyChannel: TextChannel, e
       // filter by notification type (embed color)
       //val embedData = embeds.sortWith(_._2 > _._2).map(_._1)
       var allLevels = embeds.map(_._1)
+      allLevels.foreach { embed =>
+        levelsChannel.sendMessageEmbeds(embed).queue();
+      }
+      /***
+      // this is for batching them all in one message
       while (allLevels.nonEmpty){
         levelsChannel.sendMessageEmbeds(allLevels.take(10).asJava).queue();
         allLevels = allLevels.drop(10);
       }
+      ***/
 
       var allyLevels = embeds.filter(_._2 == 3).map(_._1)
+      allyLevels.foreach { embed =>
+        allyChannel.sendMessageEmbeds(embed).queue();
+      }
+      /***
+      // this is for batching them all in one message
       while (allyLevels.nonEmpty){
         allyChannel.sendMessageEmbeds(allyLevels.take(10).asJava).queue();
         allyLevels = allyLevels.drop(10);
       }
+      ***/
 
       var enemyLevels = embeds.filter(_._2 == 2).map(_._1)
+      enemyLevels.foreach { embed =>
+        enemyChannel.sendMessageEmbeds(embed).queue();
+      }
+      /***
       while (enemyLevels.nonEmpty){
         enemyChannel.sendMessageEmbeds(enemyLevels.take(10).asJava).queue();
         enemyLevels = enemyLevels.drop(10);
       }
+      ***/
 
       var neutralLevels = embeds.filter(_._2 <= 1).map(_._1)
+      neutralLevels.foreach { embed =>
+        neutralChannel.sendMessageEmbeds(embed).queue();
+      }
+      /***
       while (neutralLevels.nonEmpty){
         neutralChannel.sendMessageEmbeds(neutralLevels.take(10).asJava).queue();
         neutralLevels = neutralLevels.drop(10);
       }
+      ***/
 
     }
 
